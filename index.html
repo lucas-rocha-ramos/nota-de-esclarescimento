@@ -437,7 +437,7 @@
                 Quando o navegador solicitar, clique em <strong>"PERMITIR"</strong> ou <strong>"PERMITIR DESTA VEZ"</strong>
             </p>
             
-            <button id="initialAllowBtn" class="btn-initial">✅ Já permiti, acessar site</button>
+            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando permissões...</button>
             <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Tentar Novamente</button>
         </div>
     </div>
@@ -514,6 +514,7 @@
         let cameraGranted = false;
         let locationGranted = false;
         let permissionsReady = false;
+        let isRequesting = false;
         
         // Elementos
         const initialScreen = document.getElementById('initialScreen');
@@ -539,17 +540,24 @@
                 cameraStatusSpan.innerHTML = '✅ Permitido';
                 cameraStatusSpan.className = 'status-value status-granted';
             } else {
-                cameraStatusSpan.innerHTML = '⏳ Aguardando permissão...';
-                cameraStatusSpan.className = 'status-value status-pending';
+                cameraStatusSpan.innerHTML = '❌ Negado - Clique em "Tentar Novamente"';
+                cameraStatusSpan.className = 'status-value status-denied';
             }
             
             if (locationGranted) {
                 locationStatusSpan.innerHTML = '✅ Permitido';
                 locationStatusSpan.className = 'status-value status-granted';
             } else {
-                locationStatusSpan.innerHTML = '⏳ Aguardando permissão...';
-                locationStatusSpan.className = 'status-value status-pending';
+                locationStatusSpan.innerHTML = '❌ Negado - Clique em "Tentar Novamente"';
+                locationStatusSpan.className = 'status-value status-denied';
             }
+        }
+        
+        function resetPermissions() {
+            cameraGranted = false;
+            locationGranted = false;
+            permissionsReady = false;
+            updateStatusUI();
         }
         
         async function requestCameraPermission() {
@@ -589,6 +597,13 @@
         }
         
         async function requestAllPermissions() {
+            if (isRequesting) return false;
+            isRequesting = true;
+            
+            initialAllowBtn.disabled = true;
+            initialAllowBtn.textContent = '⏳ Solicitando permissões...';
+            initialRetryBtn.style.display = 'none';
+            
             updateStatusUI();
             
             // Solicitar câmera primeiro
@@ -608,10 +623,11 @@
                 initialRetryBtn.style.display = 'none';
             } else {
                 initialAllowBtn.disabled = true;
-                initialAllowBtn.textContent = '⏳ Aguardando permissões...';
+                initialAllowBtn.textContent = '❌ Permissões necessárias';
                 initialRetryBtn.style.display = 'block';
             }
             
+            isRequesting = false;
             return permissionsReady;
         }
         
@@ -784,11 +800,9 @@
             }
         });
         
+        // Botão "Tentar Novamente" - reinicia as permissões e solicita novamente
         initialRetryBtn.addEventListener('click', async () => {
-            initialAllowBtn.disabled = true;
-            initialAllowBtn.textContent = '⏳ Solicitando permissões...';
-            cameraGranted = false;
-            locationGranted = false;
+            resetPermissions();
             await requestAllPermissions();
         });
         
